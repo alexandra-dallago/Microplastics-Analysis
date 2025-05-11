@@ -1,0 +1,87 @@
+#install.packages("FactoMineR")
+#install.packages("factoextra")
+
+library(FactoMineR)
+library(factoextra)
+
+# Supponiamo che il tuo dataset si chiami
+Database_analisi_R$Genus <- as.factor(Database_analisi_R$Genus)
+Database_analisi_R$Dimensione <- as.factor(Database_analisi_R$Dimensione)
+
+# MCA biologia dell'individuo 
+## Genus ✚ Sex ✚ dimensione 
+dati_mca <- Database_analisi_R[, c("Genus", "Sex", "Dimensione")]
+res.mca <- MCA(dati_mca, graph = FALSE)
+fviz_mca_var(res.mca, repel = TRUE)
+
+## Genus ✚ Nido ✚ Scope
+dati_mca <- Database_analisi_R[, c("Genus", "Nido", "Scope")]
+res.mca <- MCA(dati_mca, graph = FALSE)
+fviz_mca_var(res.mca, repel = TRUE)
+
+##Genus ✚ Sex ✚ Scope
+dati_mca <- Database_analisi_R[, c("Genus", "Sex", "Scope")]
+res.mca <- MCA(dati_mca, graph = FALSE)
+fviz_mca_var(res.mca, repel = TRUE)
+
+# MCA Location 
+##City ✚ Site ✚ Totale Microplastiche 
+dati_mca <- Database_analisi_R[, c("City", "Site", "TOT MP")]
+res.mca <- MCA(dati_mca, graph = FALSE)
+fviz_mca_var(res.mca, repel = TRUE)
+
+##City ✚ N° MP per campione ✚ Genus
+dati_mca <- Database_analisi_R[, c("City", "MPtype*COD", "Genus")]
+res.mca <- MCA(dati_mca, graph = FALSE)
+fviz_mca_var(res.mca, repel = TRUE)
+
+##Site ✚ Nido ✚ Totale Microplastiche
+dati_mca <- Database_analisi_R[, c("Site", "Nido", "TOT MP")]
+res.mca <- MCA(dati_mca, graph = FALSE)
+fviz_mca_var(res.mca, repel = TRUE)
+
+# MCA tipo di MP
+##Filamento Bianco ✚ Genus ✚ Zona (es. Testa, Torace, ecc.)
+dati_mca <- Database_analisi_R[, c("Filamento Bianco", "Genus", "Testa")]
+res.mca <- MCA(dati_mca, graph = FALSE)
+fviz_mca_var(res.mca, repel = TRUE)
+
+##Filamento Bianco✚ City ✚ Site
+dati_mca <- Database_analisi_R[, c("Filamento Bianco", "City", "Site")]
+res.mca <- MCA(dati_mca, graph = FALSE)
+fviz_mca_var(res.mca, repel = TRUE)
+
+##Scaglia Bianca ✚ Genus ✚ Scope
+dati_mca <- Database_analisi_R[, c("Filamento Bianco", "Genus", "Scope ")]
+res.mca <- MCA(dati_mca, graph = FALSE)
+fviz_mca_var(res.mca, repel = TRUE)
+
+#MCA Distribuzione del corpo 
+##Testa ✚ Torace ✚ Zampe
+dati_mca <- Database_analisi_R[, c("Testa", "Torace", "Zampe", "Addome", "Ali")]
+res.mca <- MCA(dati_mca, graph = FALSE)
+fviz_mca_var(res.mca, repel = TRUE)
+
+##Zona ✚ Dimensione ✚ Genus
+dati_mca <- Database_analisi_R[, c("Genus", "Dimensione", "Sex", "TOT MP")]
+res.mca <- MCA(dati_mca, graph = FALSE)
+fviz_mca_var(res.mca, repel = TRUE)
+
+#MCA Mix 
+##Genus ✚ City ✚ Totale Microplastiche
+dati_mca <- Database_analisi_R[, c("Genus", "City", "TOT MP")]
+res.mca <- MCA(dati_mca, graph = FALSE)
+fviz_mca_var(res.mca, repel = TRUE)
+
+##Genus ✚ City ✚ Totale Microplastiche ✚ Site
+dati_mca <- Database_analisi_R[, c("Genus", "City", "TOT MP", "Site")]
+res.mca <- MCA(dati_mca, graph = FALSE)
+fviz_mca_var(res.mca, repel = TRUE)
+
+##N° MP per campione ✚ city ✚ Dimensione ✚ Siti ✚ Genus
+dati_mca <- Database_analisi_R[, c("MPtype*COD", "City", "Dimensione", "Site", "Genus")]
+res.mca <- MCA(dati_mca, graph = FALSE)
+fviz_mca_var(res.mca, repel = TRUE)
+
+
+
