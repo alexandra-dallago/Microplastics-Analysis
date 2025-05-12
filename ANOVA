@@ -1,0 +1,25 @@
+library(ggplot2)
+
+# Prima si mette la DIPENDENTE, poi INDIPENDENTE
+# TOT MP (QUANT/DIPENDENTE) tra i diversi siti (QUALI/INDIPENDENT)
+
+anova_result <- aov(`TOT MP` ~ Site, data = Database_analisi_R)
+summary(anova_result)
+
+#Test normalizzazione Shapiro-Wilk (prima esegui anova, poi fai test normalizzazione)
+##Se p > 0.05, non rifiuti l’ipotesi nulla → i dati sono compatibili con una distribuzione normale.
+##Se p ≤ 0.05, rifiuti l’ipotesi nulla → i dati non sono normalmente distribuiti.
+
+Esempio di output:
+residui <- residuals(anova_result)
+shapiro.test(residui)
+
+ #perchè il p.value è meno di 0.05 l'ipotesi nula è rifiutata, quindi alemo una media è dviersa dalle altre
+
+#Plot risultati
+ggplot(Database_analisi_R, aes(x = Site, y = `TOT MP`)) +
+  geom_boxplot(fill = "skyblue", color = "black") +
+  labs(title = "Distribuzione delle microplastiche totali per sito",
+       x = "Sito",
+       y = "Microplastiche Totali") +
+  theme_minimal()
