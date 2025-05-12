@@ -1,0 +1,12 @@
+#Ti permette di verificare se esiste una relazione tra due variabili categoriche.
+
+#Cosa fa il test del chi-quadro?
+##H0 (ipotesi nulla): Le due variabili sono indipendenti.
+##H1 (ipotesi alternativa): Le due variabili sono dipendenti (cioè c'è una relazione tra di esse).
+
+#Interpretazione dei risultati:
+##p-value è inferiore a 0.05, puoi rifiutare l'ipotesi nulla, indicando che c'è una relazione significativa tra le due variabili categoriche.
+##Chi-squared statistic: Ti dice quanto la distribuzione osservata differisce dalla distribuzione attesa (se le variabili fossero indipendenti).
+
+chi_squared_result <- chisq.test(table(Database_analisi_R$VARIABILE, Database_analisi_R$VARIABILE))
+chi_squared_result
