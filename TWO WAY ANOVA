@@ -1,0 +1,7 @@
+#Analyze the difference between the means of more than two groups
+##data on a quantitative dependent variable at multiple levels of two categorical independent variables
+
+#A two-way ANOVA with interaction tests three null hypotheses at the same time:
+##There is no difference in group means at any level of the first independent variable.
+##There is no difference in group means at any level of the second independent variable.
+##The effect of one independent variable does not depend on the effect of the other independent variable (a.k.a. no interaction effect).
