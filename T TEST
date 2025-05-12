@@ -1,0 +1,8 @@
+# Se vuoi confrontare le medie di due gruppi (ad esempio, confrontare due siti diversi):
+# Esegui il t-test per due gruppi indipendenti
+t_test_result <- t.test(`TOT MP` ~ Sex, data = Database_analisi_R)
+
+# Visualizza i risultati
+summary(t_test_result) #se non funziona usa solo il nome della funzione senza summary
+
+
