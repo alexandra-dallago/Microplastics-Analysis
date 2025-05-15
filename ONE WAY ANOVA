@@ -2,7 +2,7 @@ library(ggplot2)
 library(multcompView)
 library(vegan)
 
-# 1. TOTALE MP 
+############# 1. TOTALE MP PER SITO #############
 mod1 <- aov(Tot_MP ~ Site, data = DB_MP)
 residui1<- residuals(mod1)
 shapiro.test(residui1)      # p-value è <0.05 --> PERMANOVA  
@@ -34,12 +34,36 @@ points(MP_nmds_3d, display = "sites", col = as.factor(DB_MP$Site), pch = 19)
 legend("topright", legend = levels(as.factor(DB_MP$Site)),
        col = 1:length(levels(as.factor(DB_MP$Site))), pch = 19)
 
-# 2. DOVE SI ACCUMULA LA PLASTICA SUL CORPO? 
-## ho fatto il test per tutte le zone e il p value è < 0.05
-mod2 <- aov(Head ~ Genus, data = DB_MP)
+############# 2. TOTALE MP PER GENUS #############
+mod2 <- aov(Tot_MP ~ Genus, data = DB_MP)
 residui2<- residuals(mod2)
 shapiro.test(residui2)      # p-value è <0.05 --> PERMANOVA  
 summary(mod2)
+
+# PERMANOVA
+MP_types_Genus <- DB_MP[, c("White_Filament","Black_Filament", "Blue_Filament","Red_Filament","Violet_Filament","Green_Filament", "White_Fragment","White_Star","X_Shape","Green_Fragment", "Others")]
+MP_types_Genus[is.na(MP_types_Genus)] <- 0 #Per sostituire NA con 0 
+adonis2(MP_types_Genus ~ Genus, data = DB_MP, method = "euclidean")  
+
+### p.value 0.001  = Ci sono differenze significative tra i gruppi
+### R2 = Genus spiega per il 35.6% % la variabilità dei dati
+
+MP_nmds <- metaMDS(MP_body, distance = "euclidean", k = 2, trymax = 100)
+
+# plot
+cols <- rainbow(length(unique(DB_MP$Genus)))
+genus_factor <- as.factor(DB_MP$Genus)
+col_genus <- cols[genus_factor]
+plot(MP_nmds, type = "n", main = "NMDS of MP_body by Genus")
+points(MP_nmds, display = "sites", col = col_genus, pch = 19)
+legend("topright", legend = levels(genus_factor), col = cols, pch = 19, cex = 0.7)
+
+############# 3. DOVE SI ACCUMULA LA PLASTICA SUL CORPO (GENERI)?  #############
+## ho fatto il test per tutte le zone e il p value è < 0.05
+mod3 <- aov(Head ~ Genus, data = DB_MP)
+residui3<- residuals(mod3)
+shapiro.test(residui3)      # p-value è <0.05 --> PERMANOVA  
+summary(mod3)
 
 ## PERMANOVA
 MP_body <- DB_MP[, c("Head", "Torax", "Abdomen", "Wings")] 
@@ -51,6 +75,67 @@ adonis2(MP_body ~ Genus, data = DB_MP, method = "euclidean")
 
 MP_nmds <- metaMDS(MP_body, distance = "euclidean", k = 2, trymax = 100)
 
+# plot
+cols <- rainbow(length(unique(DB_MP$Genus)))
+genus_factor <- as.factor(DB_MP$Genus)
+col_genus <- cols[genus_factor]
+plot(MP_nmds, type = "n", main = "NMDS of MP_body by Genus")
+points(MP_nmds, display = "sites", col = col_genus, pch = 19)
+legend("topright", legend = levels(genus_factor), col = cols, pch = 19, cex = 0.7)
 
 
+############# 4. TOTALE MP PER SESSO #############
+mod4 <- aov(Tot_MP ~ Sex, data = DB_MP)
+residui4<- residuals(mod4)
+shapiro.test(residui4)      # p-value è <0.05 --> PERMANOVA  
+summary(mod4)
 
+# PERMANOVA
+MP_types_Sex <- DB_MP[, c("White_Filament","Black_Filament", "Blue_Filament","Red_Filament","Violet_Filament","Green_Filament", "White_Fragment","White_Star","X_Shape","Green_Fragment", "Others")]
+MP_types_Sex[is.na(MP_types_Sex)] <- 0 #Per sostituire NA con 0 
+adonis2(MP_types_Sex ~ Sex, data = DB_MP, method = "euclidean")  
+
+### p.value 0.1  = NON SIGNIFICATIVO = NON CI SONO DIFFERENZE TRA MASCHI E FEMMINE
+### R2 = Il sesso spiega per il 0.26 % la variabilità dei dati
+
+MP_nmds <- metaMDS(MP_types_Sex, distance = "euclidean", k = 2, trymax = 100)
+
+plot(MP_nmds, type = "n")  
+points(MP_nmds, display = "sites", 
+       col = as.factor(DB_MP$Sex), 
+       pch = 19)
+legend("topright", 
+       legend = levels(as.factor(DB_MP$Sex)), 
+       col = 1:length(levels(as.factor(DB_MP$Sex))), 
+       pch = 19)
+
+############# 5. TOTALE MP PER DIMENSIONI #############
+mod5 <- aov(Tot_MP ~ Dimensions, data = DB_MP)
+residui5<- residuals(mod5)
+shapiro.test(residui5)      # p-value è <0.05 --> PERMANOVA  
+summary(mod4)
+
+# PERMANOVA
+MP_types_dim <- DB_MP[, c("White_Filament","Black_Filament", "Blue_Filament","Red_Filament","Violet_Filament","Green_Filament", "White_Fragment","White_Star","X_Shape","Green_Fragment", "Others")]
+MP_types_dim[is.na(MP_types_dim)] <- 0 #Per sostituire NA con 0 
+adonis2(MP_types_dim ~ Dimensions, data = DB_MP, method = "euclidean")  
+
+### p.value <0.001 significativo, quindi ci sono differenze tra i gruppi
+### R2 = le dimensioni spiegano per il 16.4% % la variabilità dei dati
+
+MP_nmds <- metaMDS(MP_types_dim, distance = "euclidean", k = 2, trymax = 100)
+
+plot(MP_nmds, type = "n")  
+points(MP_nmds, display = "Dimensions", 
+       col = as.factor(DB_MP$Dimensions), 
+       pch = 19)
+legend("topright", 
+       legend = levels(as.factor(DB_MP$Dimensions)), 
+       col = 1:length(levels(as.factor(DB_MP$Dimensions))), 
+       pch = 19)
+
+############# 6. TOTALE MP PER SCOPA #############
+mod6 <- aov(Tot_MP ~ Sex, data = DB_MP)
+residui4<- residuals(mod4)
+shapiro.test(residui4)      # p-value è <0.05 --> PERMANOVA  
+summary(mod4)
