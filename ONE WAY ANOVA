@@ -83,7 +83,6 @@ plot(MP_nmds, type = "n", main = "NMDS of MP_body by Genus")
 points(MP_nmds, display = "sites", col = col_genus, pch = 19)
 legend("topright", legend = levels(genus_factor), col = cols, pch = 19, cex = 0.7)
 
-
 ############# 4. TOTALE MP PER SESSO #############
 mod4 <- aov(Tot_MP ~ Sex, data = DB_MP)
 residui4<- residuals(mod4)
@@ -135,7 +134,42 @@ legend("topright",
        pch = 19)
 
 ############# 6. TOTALE MP PER SCOPA #############
-mod6 <- aov(Tot_MP ~ Sex, data = DB_MP)
-residui4<- residuals(mod4)
-shapiro.test(residui4)      # p-value è <0.05 --> PERMANOVA  
-summary(mod4)
+mod6 <- aov(Tot_MP ~ Scopa, data = DB_MP)
+residui6<- residuals(mod6)
+shapiro.test(residui6)      # p-value è <0.05 --> PERMANOVA  
+summary(mod6)
+
+MP_types_Scopa <- DB_MP[, c("White_Filament","Black_Filament", "Blue_Filament","Red_Filament","Violet_Filament","Green_Filament", "White_Fragment","White_Star","X_Shape","Green_Fragment", "Others")]
+MP_types_Scopa[is.na(MP_types_Scopa)] <- 0 #Per sostituire NA con 0 
+adonis2(MP_types_Scopa ~ Scopa, data = DB_MP, method = "euclidean")  
+
+### p.value <0.001 significativo, quindi ci sono differenze tra i gruppi
+### R2 = "le Scope" spiegano per il 9% la variabilità dei dati
+
+############# 7. TOTALE MP PER NIDO #############
+mod7 <- aov(Tot_MP ~ Nest, data = DB_MP)
+residui7<- residuals(mod7)
+shapiro.test(residui7)      # p-value è <0.05 --> PERMANOVA  
+summary(mod7)
+
+MP_types_Nest <- DB_MP[, c("White_Filament","Black_Filament", "Blue_Filament","Red_Filament","Violet_Filament","Green_Filament", "White_Fragment","White_Star","X_Shape","Green_Fragment", "Others")]
+MP_types_Nest[is.na(MP_types_Nest)] <- 0 #Per sostituire NA con 0 
+adonis2(MP_types_Nest ~ Nest, data = DB_MP, method = "euclidean")  
+
+### p.value <0.001 significativo, quindi ci sono differenze tra i gruppi
+### R2 = le dimensioni spiegano per il 4.06% la variabilità dei dati
+
+############# 8. TOTALE MP PER CITTA' #############
+mod8 <- aov(Tot_MP ~ City, data = DB_MP)
+residui8<- residuals(mod8)
+shapiro.test(residui8)      # p-value è <0.05 --> PERMANOVA  
+summary(mod8)
+
+MP_types_City <- DB_MP[, c("White_Filament","Black_Filament", "Blue_Filament","Red_Filament","Violet_Filament","Green_Filament", "White_Fragment","White_Star","X_Shape","Green_Fragment", "Others")]
+MP_types_City[is.na(MP_types_City)] <- 0 #Per sostituire NA con 0 
+adonis2(MP_types_City ~ City, data = DB_MP, method = "euclidean")  
+
+### p.value NON SIGNIFICATIVO = LE MP NON CAMBIANO PER CITTA'
+### R2 = la città spiega per il 0.16% la variabilità dei dati
+
+############# 9. TOTALE MP PER CITTA' #############
