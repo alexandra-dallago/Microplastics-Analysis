@@ -1,25 +1,56 @@
 library(ggplot2)
+library(multcompView)
+library(vegan)
 
-# Prima si mette la DIPENDENTE, poi INDIPENDENTE
-# TOT MP (QUANT/DIPENDENTE) tra i diversi siti (QUALI/INDIPENDENT)
+# 1. TOTALE MP 
+mod1 <- aov(Tot_MP ~ Site, data = DB_MP)
+residui1<- residuals(mod1)
+shapiro.test(residui1)      # p-value è <0.05 --> PERMANOVA  
+summary(mod1)
 
-anova_result <- aov(`TOT MP` ~ Site, data = Database_analisi_R)
-summary(anova_result)
+# PERMANOVA
+## Come le varie MP cambiano tra i siti 
+MP_types <- DB_MP[, c("White_Filament","Black_Filament", "Blue_Filament","Red_Filament","Violet_Filament","Green_Filament", "White_Fragment","White_Star","X_Shape","Green_Fragment", "Others")]
+MP_types[is.na(MP_types)] <- 0 #Per sostituire NA con 0 
+adonis2(MP_types ~ Site, data = DB_MP, method = "euclidean")  
 
-#Test normalizzazione Shapiro-Wilk (prima esegui anova, poi fai test normalizzazione)
-##Se p > 0.05, non rifiuti l’ipotesi nulla → i dati sono compatibili con una distribuzione normale.
-##Se p ≤ 0.05, rifiuti l’ipotesi nulla → i dati non sono normalmente distribuiti.
+### p.value <0.05 = Ci sono differenze significative tra i gruppi
+### R2 = quanto il tot delle variazioni è spiegato da "site" = 32%
 
-Esempio di output:
-residui <- residuals(anova_result)
-shapiro.test(residui)
+## NMDS per vedere i ridultati in un grafico 
+MP_nmds <- metaMDS(MP_types, distance = "euclidean", k = 2, trymax = 100)
+plot(MP_nmds, type = "n")
+points(MP_nmds, display = "sites", col = as.factor(DB_MP_clean$Site), pch = 19)
+legend("topright", legend = levels(as.factor(DB_MP_clean$Site)),
+       col = 1:length(levels(as.factor(DB_MP_clean$Site))), pch = 19)
 
- #perchè il p.value è meno di 0.05 l'ipotesi nula è rifiutata, quindi alemo una media è dviersa dalle altre
+# Provo ad aumentare le dimensioni NMDS per vedere meglio la separazione dei sitivi visto che il p.valueè si summary(mod1) è molto basso
+# Calcolo NMDS con 3 dimensioni
+library(vegan)
+MP_nmds_3d <- metaMDS(MP_types, distance = "euclidean", k = 3, trymax = 100)
+## Per plottare puoi vedere le prime due dimensioni (x e y)
+plot(MP_nmds_3d, type = "n")
+points(MP_nmds_3d, display = "sites", col = as.factor(DB_MP$Site), pch = 19)
+legend("topright", legend = levels(as.factor(DB_MP$Site)),
+       col = 1:length(levels(as.factor(DB_MP$Site))), pch = 19)
 
-#Plot risultati
-ggplot(Database_analisi_R, aes(x = Site, y = `TOT MP`)) +
-  geom_boxplot(fill = "skyblue", color = "black") +
-  labs(title = "Distribuzione delle microplastiche totali per sito",
-       x = "Sito",
-       y = "Microplastiche Totali") +
-  theme_minimal()
+# 2. DOVE SI ACCUMULA LA PLASTICA SUL CORPO? 
+## ho fatto il test per tutte le zone e il p value è < 0.05
+mod2 <- aov(Head ~ Genus, data = DB_MP)
+residui2<- residuals(mod2)
+shapiro.test(residui2)      # p-value è <0.05 --> PERMANOVA  
+summary(mod2)
+
+## PERMANOVA
+MP_body <- DB_MP[, c("Head", "Torax", "Abdomen", "Wings")] 
+MP_body[is.na(MP_body)] <- 0 #Per sostituire NA con 0 
+adonis2(MP_body ~ Genus, data = DB_MP, method = "euclidean")  
+
+### p.value 0.001  = Ci sono differenze significative tra i gruppi
+### R2 = Genus spiega per il 23.6% la variabilità dei dati
+
+MP_nmds <- metaMDS(MP_body, distance = "euclidean", k = 2, trymax = 100)
+
+
+
+
