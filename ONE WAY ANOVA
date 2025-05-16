@@ -66,20 +66,20 @@ shapiro.test(residui3)      # p-value è <0.05 --> PERMANOVA
 summary(mod3)
 
 ## PERMANOVA
-MP_body <- DB_MP[, c("Head", "Torax", "Abdomen", "Wings")] 
-MP_body[is.na(MP_body)] <- 0 #Per sostituire NA con 0 
-adonis2(MP_body ~ Genus, data = DB_MP, method = "euclidean")  
+MP_body_Genus <- DB_MP[, c("Head", "Torax", "Abdomen", "Wings", "Legs")] 
+MP_body_Genus[is.na(MP_body_Genus)] <- 0 #Per sostituire NA con 0 
+adonis2(MP_body_Genus ~ Genus, data = DB_MP, method = "euclidean")  
 
 ### p.value 0.001  = Ci sono differenze significative tra i gruppi
 ### R2 = Genus spiega per il 23.6% la variabilità dei dati
 
-MP_nmds <- metaMDS(MP_body, distance = "euclidean", k = 2, trymax = 100)
+MP_nmds <- metaMDS(MP_body_Genus, distance = "euclidean", k = 2, trymax = 100)
 
 # plot
 cols <- rainbow(length(unique(DB_MP$Genus)))
 genus_factor <- as.factor(DB_MP$Genus)
 col_genus <- cols[genus_factor]
-plot(MP_nmds, type = "n", main = "NMDS of MP_body by Genus")
+plot(MP_nmds, type = "n", main = "NMDS of MP_body_Genus by Genus")
 points(MP_nmds, display = "sites", col = col_genus, pch = 19)
 legend("topright", legend = levels(genus_factor), col = cols, pch = 19, cex = 0.7)
 
@@ -172,4 +172,36 @@ adonis2(MP_types_City ~ City, data = DB_MP, method = "euclidean")
 ### p.value NON SIGNIFICATIVO = LE MP NON CAMBIANO PER CITTA'
 ### R2 = la città spiega per il 0.16% la variabilità dei dati
 
-############# 9. TOTALE MP PER CITTA' #############
+############# 10. DOVE SI ACCUMULANO LE MP (SEX)? #############
+#tutt le zone correelate con i lsesso danno p.value < 0.05
+mod10 <- aov(Legs ~ Sex, data = DB_MP)
+residui10<- residuals(mod10)
+shapiro.test(residui10)      # p-value è <0.05 --> PERMANOVA  
+summary(mod10)
+
+## PERMANOVA
+MP_body_Sex <- DB_MP[, c("Head", "Torax", "Legs","Abdomen", "Wings")] 
+MP_body_Sex[is.na(MP_body_Sex)] <- 0 #Per sostituire NA con 0 
+adonis2(MP_body_Sex ~ Sex, data = DB_MP, method = "euclidean")  
+
+### p.value 0.087  = NON SIGNIFICATIVO 
+### R2 = Sex spiega per il 0.33%  la variabilità dei dati
+
+MP_nmds <- metaMDS(MP_body_Sex, distance = "euclidean", k = 2, trymax = 100)
+
+############# 11. DOVE SI ACCUMULANO LE MP (SITO)? #############
+#tutt le zone correelate con i lsesso danno p.value < 0.05
+mod11 <- aov(Abdomen ~ Site, data = DB_MP)
+residui11<- residuals(mod11)
+shapiro.test(residui11)      # p-value è <0.05 --> PERMANOVA  
+summary(mod10)
+
+## PERMANOVA
+MP_body_Site <- DB_MP[, c("Head", "Torax", "Legs","Abdomen", "Wings")] 
+MP_body_Site[is.na(MP_body_Site)] <- 0 #Per sostituire NA con 0 
+adonis2(MP_body_Site ~ Site, data = DB_MP, method = "euclidean")  
+
+### p.value 0.001  = SIGNIFICATIVO 
+### R2 = Sex spiega per il 4.8%  la variabilità dei dati
+
+MP_nmds <- metaMDS(MP_body_Sex, distance = "euclidean", k = 2, trymax = 100)
