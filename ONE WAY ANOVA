@@ -2,7 +2,7 @@ library(ggplot2)
 library(multcompView)
 library(vegan)
 
-############# 1. TOTALE MP PER SITO #############
+############# 1. TOT MP PER SITO #############
 mod1 <- aov(Tot_MP ~ Site, data = DB_MP)
 residui1<- residuals(mod1)
 shapiro.test(residui1)      # p-value è <0.05 --> PERMANOVA  
@@ -19,22 +19,13 @@ adonis2(MP_types ~ Site, data = DB_MP, method = "euclidean")
 
 ## NMDS per vedere i ridultati in un grafico 
 MP_nmds <- metaMDS(MP_types, distance = "euclidean", k = 2, trymax = 100)
-plot(MP_nmds, type = "n")
-points(MP_nmds, display = "sites", col = as.factor(DB_MP_clean$Site), pch = 19)
-legend("topright", legend = levels(as.factor(DB_MP_clean$Site)),
-       col = 1:length(levels(as.factor(DB_MP_clean$Site))), pch = 19)
 
-# Provo ad aumentare le dimensioni NMDS per vedere meglio la separazione dei sitivi visto che il p.valueè si summary(mod1) è molto basso
-# Calcolo NMDS con 3 dimensioni
-library(vegan)
-MP_nmds_3d <- metaMDS(MP_types, distance = "euclidean", k = 3, trymax = 100)
-## Per plottare puoi vedere le prime due dimensioni (x e y)
-plot(MP_nmds_3d, type = "n")
-points(MP_nmds_3d, display = "sites", col = as.factor(DB_MP$Site), pch = 19)
+plot(MP_nmds, type = "n")
+points(MP_nmds, display = "sites", col = as.factor(DB_MP$Site), pch = 19)
 legend("topright", legend = levels(as.factor(DB_MP$Site)),
        col = 1:length(levels(as.factor(DB_MP$Site))), pch = 19)
 
-############# 2. TOTALE MP PER GENUS #############
+############# 2. TOT MP PER GENUS #############
 mod2 <- aov(Tot_MP ~ Genus, data = DB_MP)
 residui2<- residuals(mod2)
 shapiro.test(residui2)      # p-value è <0.05 --> PERMANOVA  
@@ -99,14 +90,12 @@ adonis2(MP_types_Sex ~ Sex, data = DB_MP, method = "euclidean")
 
 MP_nmds <- metaMDS(MP_types_Sex, distance = "euclidean", k = 2, trymax = 100)
 
-plot(MP_nmds, type = "n")  
-points(MP_nmds, display = "sites", 
-       col = as.factor(DB_MP$Sex), 
-       pch = 19)
-legend("topright", 
-       legend = levels(as.factor(DB_MP$Sex)), 
-       col = 1:length(levels(as.factor(DB_MP$Sex))), 
-       pch = 19)
+cols <- rainbow(length(unique(DB_MP$Sex)))
+genus_factor <- as.factor(DB_MP$Sex)
+col_genus <- cols[genus_factor]
+plot(MP_nmds, type = "n", main = "NMDS of MP_types_Sex by Sex")
+points(MP_nmds, display = "sites", col = col_genus, pch = 19)
+legend("topright", legend = levels(genus_factor), col = cols, pch = 19, cex = 0.7)
 
 ############# 5. TOTALE MP PER DIMENSIONI #############
 mod5 <- aov(Tot_MP ~ Dimensions, data = DB_MP)
@@ -124,14 +113,12 @@ adonis2(MP_types_dim ~ Dimensions, data = DB_MP, method = "euclidean")
 
 MP_nmds <- metaMDS(MP_types_dim, distance = "euclidean", k = 2, trymax = 100)
 
-plot(MP_nmds, type = "n")  
-points(MP_nmds, display = "Dimensions", 
-       col = as.factor(DB_MP$Dimensions), 
-       pch = 19)
-legend("topright", 
-       legend = levels(as.factor(DB_MP$Dimensions)), 
-       col = 1:length(levels(as.factor(DB_MP$Dimensions))), 
-       pch = 19)
+cols <- rainbow(length(unique(DB_MP$Dimension)))
+genus_factor <- as.factor(DB_MP$Dimension)
+col_genus <- cols[genus_factor]
+plot(MP_nmds, type = "n", main = "NMDS of MP_types_dim by Dimension")
+points(MP_nmds, display = "sites", col = col_genus, pch = 19)
+legend("topright", legend = levels(genus_factor), col = cols, pch = 19, cex = 0.7)
 
 ############# 6. TOTALE MP PER SCOPA #############
 mod6 <- aov(Tot_MP ~ Scopa, data = DB_MP)
