@@ -175,3 +175,40 @@ shapiro.test(residui7)   #W = 0.8809, p-value < 2.2e-16 ; NON seguono una distri
 
 bartlett.test(Tot_MP ~ City, data = DB_MP) #p-value 0.07319 ; NON SIGNIFICATIVE ; 
 kruskal.test(Tot_MP ~ City, data = DB_MP) #p-value 0.9227 ; NON ESISTONO differenze significative tra i gruppi 
+
+############# 3. DOVE SI ACCUMULA LA PLASTICA SUL CORPO (TESTA*GENERI)?  #############
+# NON PENSO ABBIA SENSO
+
+mod8 <- aov(Head ~ Genus, data = DB_MP)
+residui8<- residuals(mod8)
+shapiro.test(residui8)      # p-value è 0.00014 
+summary(mod8)
+#bartlett.test(Head ~ Genus, data = DB_MP) 
+kruskal.test(Head ~ Genus, data = DB_MP) #0.01496 ; ESISTONO differenze significative tra i gruppi 
+dunn_test <- dunnTest(Head ~ Genus, data = DB_MP, method = "bonferroni") # p.adj =0.02139387 = SIGNIFICATIVO 
+dunn_test
+
+#Grafico
+cld <- cldList(comparison = dunn_test$res$Comparison,
+               p.value = dunn_test$res$P.adj,
+               threshold = 0.05)
+ggplot(DB_MP, aes(x = Genus, y = Head)) +
+  geom_boxplot(fill = "skyblue") +
+  geom_text(data = cld,
+            aes(x = Group,
+                y = max(DB_MP$Head, na.rm = TRUE) * 1.05,
+                label = Letter),
+            inherit.aes = FALSE,
+            size = 5) +
+  theme_minimal() +
+  ggtitle("MP trovare sulla testa in abse al genere")
+
+
+############# DOVE SI ACCUMULANO LE MP (LEGS*SEX)? #############
+mod9 <- aov(Legs ~ Sex, data = DB_MP)
+residui9<- residuals(mod9)
+shapiro.test(residui9)      #W = 0.75831, p-value < 2.2e-16
+summary(mod9)
+bartlett.test(Legs ~ Sex, data = DB_MP) p-value = 0.158  NON ESISTONO differenze 
+kruskal.test(Legs ~ Sex, data = DB_MP) #p-value = 0.4348; NON ESISTONO differenze significative tra i gruppi 
+
