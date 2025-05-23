@@ -1,0 +1,177 @@
+library(ggplot2)
+library(multcompView)
+library(vegan)
+library(car)
+library(FSA)
+library(rcompanion)
+library(dplyr)
+library(patchwork)
+
+############# TOT MP * SITE ############# 
+
+mod1 <- aov(Tot_MP ~ Site, data = DB_MP)
+summary(mod1)
+residui1 <- residuals(mod1)
+shapiro.test(residui1) #W = 0.85628, p-value < 2.2e-16 ; distribuzione NON normale
+bartlett.test(Tot_MP ~ Site, data = DB_MP) #p-value = 3.072e-13 ; varianze NON omogenea 
+kruskal.test(Tot_MP ~ Site, data = DB_MP) #p-value = 4.427e-10 ; ESISTONO differenze significative tra i gruppi 
+dunn_test<-dunnTest(Tot_MP ~ Site, data = DB_MP, method = "bonferroni") #p.adj>0.05 = SIGNIFICATIVO ; p.adj>0.05 NON significativo
+
+#Grafico 
+cld <- cldList(comparison = dunn_test$res$Comparison,
+               p.value = dunn_test$res$P.adj,
+               threshold = 0.05)
+ggplot(DB_MP, aes(x = Site, y = Tot_MP)) +
+  geom_boxplot(fill = "skyblue") +
+  geom_text(data = cld,
+            aes(x = Group,
+                y = max(DB_MP$Tot_MP, na.rm = TRUE) * 1.05,
+                label = Letter),
+            inherit.aes = FALSE,
+            size = 5) +
+  theme_minimal() +
+  ggtitle("Tot_MP per Sito con gruppi significativi")
+
+############# TOT MP PER GENUS ############# 
+# Non penso abbia senso 
+mod2 <- aov(Tot_MP ~ Genus, data = DB_MP)
+summary(mod2)
+residui2 <- residuals(mod2)
+shapiro.test(residui2) # W = 0.90375, p-value < 2.2e-16; distribuzione NON normale
+#bartlett.test(Tot_MP ~ Genus, data = DB_MP) # p-value = 3.072e-13 ; varianze NON omogenee 
+kruskal.test(Tot_MP ~ Genus, data = DB_MP) # p-value < 2.2e-16; ESISTONO differenze significative tra i gruppi 
+dunn_test <- dunnTest(Tot_MP ~ Genus, data = DB_MP, method = "bonferroni") # p.adj < 0.05 = SIGNIFICATIVO ; p.adj > 0.05 NON significativo
+
+# Grafico 
+cld <- cldList(comparison = dunn_test$res$Comparison,
+               p.value = dunn_test$res$P.adj,
+               threshold = 0.05)
+ggplot(DB_MP, aes(x = Genus, y = Tot_MP)) +
+  geom_boxplot(fill = "skyblue") +
+  geom_text(data = cld,
+            aes(x = Group,
+                y = max(DB_MP$Tot_MP, na.rm = TRUE) * 1.05,
+                label = Letter),
+            inherit.aes = FALSE,
+            size = 5) +
+  theme_minimal() +
+  ggtitle("Tot_MP per Genus con gruppi significativi")
+
+############# TOTALE MP PER SESSO #############
+mod3 <- aov(Tot_MP ~ Sex, data = DB_MP)
+residui3<- residuals(mod3)
+shapiro.test(residui3)      #W = 0.83378, p-value < 2.2e-16
+summary(mod3)
+bartlett.test(Tot_MP ~ Sex, data = DB_MP) #p-value = 0.01084 ; NON SIGNIFICATIVE
+kruskal.test(Tot_MP ~ Sex, data = DB_MP) # p-value = 0.02139; ESISTONO differenze significative tra i gruppi 
+dunn_test <- dunnTest(Tot_MP ~ Sex, data = DB_MP, method = "bonferroni") # p.adj =0.02139387 = SIGNIFICATIVO 
+dunn_test
+
+#Grafico
+cld <- cldList(comparison = dunn_test$res$Comparison,
+               p.value = dunn_test$res$P.adj,
+               threshold = 0.05)
+ggplot(DB_MP, aes(x = Sex, y = Tot_MP)) +
+  geom_boxplot(fill = "skyblue") +
+  geom_text(data = cld,
+            aes(x = Group,
+                y = max(DB_MP$Tot_MP, na.rm = TRUE) * 1.05,
+                label = Letter),
+            inherit.aes = FALSE,
+            size = 5) +
+  theme_minimal() +
+  ggtitle("Tot_MP per Sex con gruppi significativi")
+
+############# TOTALE MP PER DIMENSIONI #############
+mod4 <- aov(Tot_MP ~ Dimensions, data = DB_MP)
+residui4<- residuals(mod4)
+shapiro.test(residui4)      #W = 0.87696, p-value < 2.2e-16
+summary(mod4)
+bartlett.test(Tot_MP ~ Dimensions, data = DB_MP) #p-value < 2.2e-16; SIGNIFICATIVE
+kruskal.test(Tot_MP ~ Dimensions, data = DB_MP) #p-value < 2.2e-16; ESISTONO differenze significative tra i gruppi 
+dunn_test <- dunnTest(Tot_MP ~ Dimensions, data = DB_MP, method = "bonferroni") # p.adj =0.02139387 = SIGNIFICATIVO 
+dunn_test
+
+#Confronto B - M: p.adj = 0.8054 → non significativo
+#Confronto B - S: p.adj ≈ 6e-19 → altamente significativo
+#Confronto M - S: p.adj ≈ 4.6e-24 → altamente significativo
+
+#Grafico
+cld <- cldList(comparison = dunn_test$res$Comparison,
+               p.value = dunn_test$res$P.adj,
+               threshold = 0.05)
+ggplot(DB_MP, aes(x = Dimensions, y = Tot_MP)) +
+  geom_boxplot(fill = "skyblue") +
+  geom_text(data = cld,
+            aes(x = Group,
+                y = max(DB_MP$Tot_MP, na.rm = TRUE) * 1.05,
+                label = Letter),
+            inherit.aes = FALSE,
+            size = 5) +
+  theme_minimal() +
+  ggtitle("Tot_MP per Dimensioni con gruppi significativi")
+
+############# TOTALE MP PER SCOPA #############
+mod5 <- aov(Tot_MP ~ Scopa, data = DB_MP)
+residui5<- residuals(mod5)
+summary(mod5)
+shapiro.test(residui5)      #W = 0.84, p-value < 2.2e-16 ; NON seguono una distribuzione normale.
+
+bartlett.test(Tot_MP ~ Scopa, data = DB_MP) #p-value < 2.2e-16 ; SIGNIFICATIVE
+kruskal.test(Tot_MP ~ Scopa, data = DB_MP) #p-value < 7.166e-16 ; ESISTONO differenze significative tra i gruppi 
+dunn_test <- dunnTest(Tot_MP ~ Scopa, data = DB_MP, method = "bonferroni") # p.adj =0.02139387 = SIGNIFICATIVO 
+dunn_test
+
+#Grafico
+cld <- cldList(comparison = dunn_test$res$Comparison,
+               p.value = dunn_test$res$P.adj,
+               threshold = 0.05)
+ggplot(DB_MP, aes(x = Scopa, y = Tot_MP)) +
+  geom_boxplot(fill = "skyblue") +
+  geom_text(data = cld,
+            aes(x = Group,
+                y = max(DB_MP$Tot_MP, na.rm = TRUE) * 1.05,
+                label = Letter),
+            inherit.aes = FALSE,
+            size = 5) +
+  theme_minimal() +
+  ggtitle("Tot_MP per Scopa con gruppi significativi")
+
+############# TOTALE MP PER NIDO #############
+DB_MP <- DB_MP %>%
+  mutate(Nest = na_if(Nest, "NA")) %>%  # trasforma "NA" in NA vero
+  filter(!is.na(Tot_MP), !is.na(Nest)) %>%  # filtra NA veri
+  droplevels() 
+
+mod6 <- aov(Tot_MP ~ Nest, data = DB_MP)
+residui6<- residuals(mod6)
+shapiro.test(residui6)      # W = 0.87138, p-value < 2.2e-16
+summary(mod6)
+#bartlett.test(Tot_MP ~ Nest, data = DB_MP) #p-value < 2.2e-16 ; SIGNIFICATIVE
+kruskal.test(Tot_MP ~ Nest, data = DB_MP) #p-value < 1.243e-08 ; ESISTONO differenze significative tra i gruppi 
+dunn_test <- dunnTest(Tot_MP ~ Nest, data = DB_MP, method = "bonferroni") # p.adj =0.02139387 = SIGNIFICATIVO 
+dunn_test
+
+#Grafico
+cld <- cldList(comparison = dunn_test$res$Comparison,
+               p.value = dunn_test$res$P.adj,
+               threshold = 0.05)
+ggplot(DB_MP, aes(x = Nest, y = Tot_MP)) +
+  geom_boxplot(fill = "skyblue") +
+  geom_text(data = cld,
+            aes(x = Group,
+                y = max(DB_MP$Tot_MP, na.rm = TRUE) * 1.05,
+                label = Letter),
+            inherit.aes = FALSE,
+            size = 5) +
+  theme_minimal() +
+  ggtitle("Tot_MP per Nest con gruppi significativi")
+
+############# TOTALE MP PER CITTA' #############
+mod7 <- aov(Tot_MP ~ City, data = DB_MP)
+residui7<- residuals(mod7)
+summary(mod7)  
+shapiro.test(residui7)   #W = 0.8809, p-value < 2.2e-16 ; NON seguono una distribuzione normale.
+
+bartlett.test(Tot_MP ~ City, data = DB_MP) #p-value 0.07319 ; NON SIGNIFICATIVE ; 
+kruskal.test(Tot_MP ~ City, data = DB_MP) #p-value 0.9227 ; NON ESISTONO differenze significative tra i gruppi 
