@@ -1,8 +1,3 @@
-#install.packages("FactoMineR")
-#install.packages("factoextra")
-
-library(FactoMineR)
-library(factoextra)
 
 # Supponiamo che il tuo dataset si chiami
 Database_analisi_R$Genus <- as.factor(Database_analisi_R$Genus)
@@ -10,9 +5,10 @@ Database_analisi_R$Dimensione <- as.factor(Database_analisi_R$Dimensione)
 
 # MCA biologia dell'individuo 
 ## Genus ✚ Sex ✚ dimensione 
-dati_mca <- Database_analisi_R[, c("Genus", "Sex", "Dimensione")]
+dati_mca <- DB_MP[, c("Genus", "Sex", "Dimensions")]
 res.mca <- MCA(dati_mca, graph = FALSE)
 fviz_mca_var(res.mca, repel = TRUE)
+fviz_mca_ind(res.mca, repel = TRUE)
 
 ## Genus ✚ Nido ✚ Scope
 dati_mca <- Database_analisi_R[, c("Genus", "Nido", "Scope")]
