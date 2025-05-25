@@ -1,0 +1,163 @@
+############## Il TOT MP varia in base alla città, al tipo di sito e al genere e al sesso dell’ape? ##############
+model1 <- glm(Tot_MP ~ City + Site + Genus + Sex, 
+             family = poisson(link = "log"), 
+             data = DB_MP)
+
+#Controllo overdispersione
+dispersion1 <- sum(residuals(model1, type = "pearson")^2) / df.residual(model1) # 1.666197
+dispersion1
+##Valore ≈ 1 →  poisson
+##Se > 1.5 →  quasipoisson o MASS
+
+#Distribuzione negative binomial 
+model_nb1 <- glm.nb(Tot_MP ~ City + Site + Genus + Sex, data = DB_MP)
+## Come leggere i coefficienti: visto che sono in sala log: NEG=diminuzione attesa; POS=aumento atteso
+
+#grafico 
+library(ggeffects)
+plot(ggpredict(model_nb1, terms = c("Site", "City")))
+
+############# Il TOT MP varia in base alla città * sito e al genere e al sesso dell’ape? ##############
+model1 <- glm(Tot_MP ~ City * Site + Genus + Sex, 
+             family = poisson(link = "log"), 
+             data = DB_MP)
+
+#Controllo overdispersione
+dispersion1 <- sum(residuals(model1, type = "pearson")^2) / df.residual(model1) # 1.666197
+dispersion1
+##Valore ≈ 1 →  poisson
+##Se > 1.5 →  quasipoisson o MASS
+
+#Distribuzione negative binomial 
+model_nb1 <- glm.nb(Tot_MP ~ City + Site + Genus + Sex, data = DB_MP) #AIC: 2884
+## Come leggere i coefficienti: visto che sono in sala log: NEG=diminuzione attesa; POS=aumento atteso
+
+#grafico 
+plot(ggpredict(model_nb1, terms = c("Site", "City")))
+
+############# Modello base totale microplastiche (Tot_MP) ##############
+model2 <- glm(Tot_MP ~ City + Site + Date + Genus + Sex + Nest + Scopa + Dimensions,
+             family = poisson(link = "log"), 
+             data = DB_MP)
+dispersion2 <- sum(residuals(model2, type = "pearson")^2) / df.residual(model2) # 1.492533
+dispersion2
+
+model_nb2 <- glm.nb(Tot_MP ~ City + Site + Date + Genus + Sex + Nest + Scopa + Dimensions, data = DB_MP)
+## COEFF: NEG=diminuzione attesa; POS=aumento atteso
+model_nb2 #AIC: 2846
+
+#grafico 
+# Calcola gli effetti marginali
+eff_city <- ggpredict(model_nb2, terms = "City")
+eff_site <- ggpredict(model_nb2, terms = "Site")
+eff_date <- ggpredict(model_nb2, terms = "Date")
+eff_genus <- ggpredict(model_nb2, terms = "Genus")
+eff_sex <- ggpredict(model_nb2, terms = "Sex")
+eff_nest <- ggpredict(model_nb2, terms = "Nest")
+eff_scopa <- ggpredict(model_nb2, terms = "Scopa")
+eff_dim <- ggpredict(model_nb2, terms = "Dimensions")
+
+# Crea grafici singoli
+p1 <- plot(eff_city) + ggtitle("City") + theme_minimal()
+p2 <- plot(eff_site) + ggtitle("Site") + theme_minimal()
+p3 <- plot(eff_date) + ggtitle("Date") + theme_minimal()
+p4 <- plot(eff_genus) + ggtitle("Genus") + theme_minimal()
+p5 <- plot(eff_sex) + ggtitle("Sex") + theme_minimal()
+p6 <- plot(eff_nest) + ggtitle("Nest") + theme_minimal()
+p7 <- plot(eff_scopa) + ggtitle("Scopa") + theme_minimal()
+p8 <- plot(eff_dim) + ggtitle("Dimensions") + theme_minimal()
+
+final_plot <- (p1 | p2 | p3 | p4) / (p5 | p6 | p7 | p8)
+final_plot
+
+############# Modello con interazioni spaziali e biologiche ##############
+model3 <- glm(Tot_MP ~ City * Site + Genus * Sex + Nest + Scopa + Dimensions,
+             family = poisson(link = "log"), 
+             data = DB_MP)
+dispersion3 <- sum(residuals(model3, type = "pearson")^2) / df.residual(model3) #1.543864
+dispersion3
+
+model_nb3 <- glm.nb(Tot_MP ~ City * Site + Genus * Sex + Nest + Scopa + Dimensions, data = DB_MP)
+## COEFF: NEG=diminuzione attesa; POS=aumento atteso
+model_nb3 #AIC: 2865
+
+#effetti marginali per le interazioni 
+eff_site_city <- ggpredict(model_nb3, terms = c("Site", "City"))
+eff_genus_sex <- ggpredict(model_nb3, terms = c("Genus", "Sex"))
+
+# Grafico 1: Site x City (con punti e linee raggruppate)
+p1 <- ggplot(eff_site_city, aes(x = x, y = predicted, color = group, group = group)) +
+  geom_point(size = 3) +
+  geom_line(size = 1) +
+  geom_ribbon(aes(ymin = conf.low, ymax = conf.high, fill = group), alpha = 0.2, color = NA) +
+  labs(
+    title = "Effetti marginali: Site × City",
+    x = "Site",
+    y = "Predicted Tot_MP",
+    color = "City",
+    fill = "City"
+  ) +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 14),
+        axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Grafico 2: Genus x Sex (idem)
+p2 <- ggplot(eff_genus_sex, aes(x = x, y = predicted, color = group, group = group)) +
+  geom_point(size = 3) +
+  geom_line(size = 1) +
+  geom_ribbon(aes(ymin = conf.low, ymax = conf.high, fill = group), alpha = 0.2, color = NA) +
+  labs(
+    title = "Effetti marginali: Genus × Sex",
+    x = "Genus",
+    y = "Predicted Tot_MP",
+    color = "Sex",
+    fill = "Sex"
+  ) +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 14),
+        axis.text.x = element_text(angle = 45, hjust = 1))
+final_graph <- p1 + p2
+
+############# Modello focalizzato sulle zone anatomiche con MPtype ##############
+model4 <- glm(Tot_MP ~ Head + Torax + Abdomen + Legs + Wings + MPtype_COD + City + Site + Genus + Sex,
+             family = poisson(link = "log"), 
+             data = DB_MP)
+dispersion4 <- sum(residuals(model4, type = "pearson")^2) / df.residual(model4) #0.07905975
+dispersion4
+
+#############  verificare se la presenza di forme particolari dipende da variabili biologiche e ambientali ##############
+###############non funziona #################
+model5 <- glm(White_Filament+Black_Filament+Red_Filament+Blue_Filament+Green_Filament+Violet_Filament+White_Fragment+Green_Fragment+White_Star+X_Shape+Others
+ ~ City + Site + Genus + Sex + Nest + Scopa,
+             family = poisson(link = "log"), 
+             data = DB_MP)
+dispersion5 <- sum(residuals(model5, type = "pearson")^2) / df.residual(model5) 
+dispersion5
+
+############# capire se il tipo di microplastica ha un effetto diverso a seconda della parte anatomica ##############
+
+model6 <- glm(Tot_MP ~ MPtype_COD * Head + MPtype_COD * Torax + City + Site + Genus + Sex + Nest,
+             family = poisson(link = "log"), 
+             data = DB_MP)
+dispersion6 <- sum(residuals(model6, type = "pearson")^2) / df.residual(model6) #0.8324642
+dispersion6
+
+# Effetti marginali per l'interazione MPtype_COD * Head
+eff_head <- ggpredict(model6, terms = c("MPtype_COD", "Head"))
+plot(eff_head)
+
+# Effetti marginali per l'interazione MPtype_COD * Torax
+eff_torax <- ggpredict(model6, terms = c("MPtype_COD", "Torax"))
+plot(eff_torax)
+
+p1 <- plot(eff_head) + ggtitle("MPtype_COD * Head") + theme_minimal()
+p2 <- plot(eff_torax) + ggtitle("MPtype_COD * Torax") + theme_minimal()
+
+F <- (p1 + p2 )
+
+
+############# Modello combinato con interazioni multiple #############
+Tot_MP ~ City * Site + Genus * Sex + MPtype_COD * (Head + Thorax + Abdomen) + Nest + Scopa + Dimensions
+
+
+
