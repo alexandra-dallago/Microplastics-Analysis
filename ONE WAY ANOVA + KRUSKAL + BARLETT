@@ -19,6 +19,15 @@ kruskal.test(Tot_MP ~ Site, data = DB_MP) #p-value = 4.427e-10 ; ESISTONO differ
 dunn_test<-dunnTest(Tot_MP ~ Site, data = DB_MP, method = "bonferroni") #p.adj>0.05 = SIGNIFICATIVO ; p.adj>0.05 NON significativo
 dunn_test
 
+#	Bam - CREAA	3.5e-07
+#	CREAA - Dumbo	0.0219
+#	Bam - Giardini Margherita	0.000137
+#	Bam - Parco Nord	1.04e-07
+# Dumbo - Parco Nord	0.0439
+#	Bam - Velodromo	2e-07
+#	Dumbo - Velodromo
+
+
 #Grafico 
 TOTMP_SITE<- cldList(comparison = dunn_test$res$Comparison,
                p.value = dunn_test$res$P.adj,
@@ -127,13 +136,13 @@ DB_MP_noNA <- DB_MP[!is.na(DB_MP$Scopa), ]
 DB_MP_noNA <- DB_MP_noNA[DB_MP_noNA$Scopa != "NA", ]
 
 # 3. converto Nest in fattore e poi tolgo livelli inutilizzati
-DB_MP_noNA$Nest <- factor(DB_MP_noNA$Scopa)
-DB_MP_noNA$Nest <- droplevels(DB_MP_noNA$Scopa)
+DB_MP_noNA$Scopa <- factor(DB_MP_noNA$Scopa)
+DB_MP_noNA$Scopa <- droplevels(DB_MP_noNA$Scopa)
 
 mod5 <- aov(Tot_MP ~ Scopa, data = DB_MP_noNA )
 residui5<- residuals(mod5)
 summary(mod5)
-shapiro.test(residui5)   W = 0.89537, p-value = 3.689e-16 ; NON seguono una distribuzione normale.
+shapiro.test(residui5)  #W = 0.89537, p-value = 3.689e-16 ; NON seguono una distribuzione normale.
 leveneTest(Tot_MP ~ Scopa, data = DB_MP_noNA )  #p-value 0.005896; VARIANZE DIVERSE 
 
 kruskal.test(Tot_MP ~ Scopa, data = DB_MP_noNA ) #p-value 1.968e-15 ; ESISTONO differenze significative tra i gruppi 
@@ -151,7 +160,7 @@ dunn_test
 TOTMP_SCOPA <- cldList(comparison = dunn_test$res$Comparison,
                p.value = dunn_test$res$P.adj,
                threshold = 0.05)
-ggplot(DB_MP, aes(x = Scopa, y = Tot_MP)) +
+ggplot(DB_MP_noNA, aes(x = Scopa, y = Tot_MP)) +
   geom_boxplot(fill = "skyblue") +
   geom_text(data = TOTMP_SCOPA,
             aes(x = Group,
@@ -176,21 +185,21 @@ DB_MP_noNA$Nest <- factor(DB_MP_noNA$Nest)
 DB_MP_noNA$Nest <- droplevels(DB_MP_noNA$Nest)
 
 
-mod6 <- aov(Tot_MP ~ Nest, data = DB_MP)
+mod6 <- aov(Tot_MP ~ Nest, data = DB_MP_noNA )
 residui6<- residuals(mod6)
 shapiro.test(residui6)      # W = 0.87138, p-value < 2.2e-16
 summary(mod6)
-leveneTest(Tot_MP ~ Nest, data = DB_MP)  #p-value 0.7424; ACCETTI H0
+leveneTest(Tot_MP ~ Nest, data = DB_MP_noNA )  #p-value 0.7424; ACCETTI H0
 
-kruskal.test(Tot_MP ~ Nest, data = DB_MP) #p-value < 1.243e-08 ; ESISTONO differenze significative tra i gruppi 
-dunn_test <- dunnTest(Tot_MP ~ Nest, data = DB_MP, method = "bonferroni") # p.adj =0.02139387 = SIGNIFICATIVO 
+kruskal.test(Tot_MP ~ Nest, data = DB_MP_noNA ) #p-value < 1.243e-08 ; ESISTONO differenze significative tra i gruppi 
+dunn_test <- dunnTest(Tot_MP ~ Nest, data = DB_MP_noNA, method = "bonferroni") # p.adj =0.02139387 = SIGNIFICATIVO 
 dunn_test
 
 #Grafico
 TOTMP_NEST <- cldList(comparison = dunn_test$res$Comparison,
                p.value = dunn_test$res$P.adj,
                threshold = 0.05)
-ggplot(DB_MP, aes(x = Nest, y = Tot_MP)) +
+ggplot(DB_MP_noNA, aes(x = Nest, y = Tot_MP)) +
   geom_boxplot(fill = "skyblue") +
   geom_text(data = TOTMP_NEST,
             aes(x = Group,
@@ -374,6 +383,51 @@ ggplot(DB_MP_noNA, aes(x = Nest, y = MPtype_COD, fill = Nest)) +
        x = "Nest") +
   theme(legend.position = "none") +
   ylim(NA, max(letters_df$y) * 1.1)
+
+############# TOT MP ~ CITY + SITE ############# 
+
+mod13<- aov(Tot_MP ~ City + Site, data = DB_MP)
+summary(mod13)
+residui13 <- residuals(mod13)
+shapiro.test(residui13) #W = 0.85628, p-value < 2.2e-16 distribuzione NON normale
+
+#Raggruppo le variabili, altrimenti levene non funziona
+leveneTest(Tot_MP ~ interaction(City, Site), data = DB_MP) #p.value=0.001617 ; varianze non omogenee 
+
+kruskal.test(Tot_MP ~ interaction(City, Site), data = DB_MP) #p-value = 4.427e-10 ;  ESISTONO differenze 
+
+dunn_test <- dunnTest(Tot_MP ~ interaction(City, Site), data = DB_MP, method = "bonferroni")
+dunn_test
+
+#	Bologna.CREAA - Bologna.Dumbo	0.0219
+#	Bologna.CREAA - Milan.Bam	3.5e-07
+#	Bologna.Giardini Margherita - Milan.Bam	0.000137
+#	Bologna.Dumbo - Milan.Parco Nord	0.0439
+#	Bologna.Dumbo - Milan.Velodromo	0.0458
+#	Milan.Bam - Milan.Velodromo	2e-07
+
+ggplot(DB_MP, aes(x = interaction(City, Site), y = Tot_MP, fill = City)) +
+  geom_boxplot() +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(title = "Distribuzione Tot_MP per gruppo City-Site",
+       x = "Gruppi (City.Site)", y = "Tot_MP") +
+  geom_signif(
+    comparisons = list(
+      c("Bologna.CREAA", "Bologna.Dumbo"),
+      c("Bologna.CREAA", "Milan.Bam"),
+      c("Bologna.Dumbo", "Milan.Bam"),
+      c("Bologna.Giardini Margherita", "Milan.Bam"),
+      c("Bologna.Dumbo", "Milan.Parco Nord"),
+      c("Milan.Bam", "Milan.Parco Nord"),
+      c("Bologna.Dumbo", "Milan.Velodromo"),
+      c("Milan.Bam", "Milan.Velodromo")),
+    map_signif_level = FALSE, 
+    annotations = NA,          
+    test = "wilcox.test",
+    step_increase = 0.1)
+
+
 
 ############# 3. DOVE SI ACCUMULA LA PLASTICA SUL CORPO (TESTA*GENERI)?  #############
 # NON PENSO ABBIA SENSO
