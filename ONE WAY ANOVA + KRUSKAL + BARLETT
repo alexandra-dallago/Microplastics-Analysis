@@ -8,7 +8,6 @@ library(dplyr)
 library(patchwork)
 
 ############# TOT MP * SITE ############# 
-
 mod1 <- aov(Tot_MP ~ Site, data = DB_MP)
 summary(mod1)
 residui1 <- residuals(mod1)
@@ -26,7 +25,6 @@ dunn_test
 # Dumbo - Parco Nord	0.0439
 #	Bam - Velodromo	2e-07
 #	Dumbo - Velodromo
-
 
 #Grafico 
 TOTMP_SITE<- cldList(comparison = dunn_test$res$Comparison,
