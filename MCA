@@ -1,31 +1,41 @@
+#CONVERTO IN CATEGORIE
+# Crea una copia del database originale
+DB_MP_f <- DB_MP
+
+# Converte le colonne MPtype_COD e Tot_MP in fattori
+DB_MP_f$MPtype_COD <- as.factor(DB_MP_f$MPtype_COD)
+DB_MP_f$Tot_MP <- as.factor(DB_MP_f$Tot_MP)
+DB_MP_f$Tot_MP <- as.factor(DB_MP_f$White_Filament)
+DB_MP_f$Tot_MP <- as.factor(DB_MP_f$White_Fragment)
+
 ################## MCA Location ##################
 ##City ✚ Site ✚ TOT Microplastiche 
-MCA1 <- DB_MP[, c("City", "Site", "Tot_MP")]
+MCA1 <- DB_MP_f[, c("City", "Site", "Tot_MP")]
 res.mca1 <- MCA(MCA1, graph = FALSE)
 fviz_mca_var(res.mca1, repel = TRUE)
 
 ##City ✚ Site ✚ TIPO Microplastiche 
-MCA1 <- DB_MP[, c("City", "Site", "MPtype_COD")]
+MCA1 <- DB_MP_f[, c("City", "Site", "MPtype_COD")]
 res.mca1 <- MCA(MCA1, graph = FALSE)
 fviz_mca_var(res.mca1, repel = TRUE)
 
 ##City ✚ TIPO Microplastiche ✚ Genus
-MCA2 <-DB_MP[, c("City", "MPtype_COD", "Genus")]
+MCA2 <-DB_MP_f[, c("City", "MPtype_COD", "Genus")]
 res.mca2 <- MCA(MCA2, graph = FALSE)
 fviz_mca_var(res.mca2, repel = TRUE)
 
 ##City ✚ Tot MP ✚ Genus
-MCA2 <-DB_MP[, c("City", "Tot_MP", "Genus")]
+MCA2 <-DB_MP_f[, c("City", "Tot_MP", "Genus")]
 res.mca2 <- MCA(MCA2, graph = FALSE)
 fviz_mca_var(res.mca2, repel = TRUE)
 
 ##Site ✚ Nido ✚ TOT Microplastiche
-MCA3 <- DB_MP[, c("Site", "Nest", "Tot_MP")]
+MCA3 <- DB_MP_f[, c("Site", "Nest", "Tot_MP")]
 res.mca3 <- MCA(MCA3, graph = FALSE)
 fviz_mca_var(res.mca3, repel = TRUE)
 
 ##Site ✚ Nido ✚ TIPO Microplastiche
-MCA3 <- DB_MP[, c("Site", "Nest", "MPtype_COD")]
+MCA3 <- DB_MP_f[, c("Site", "Nest", "MPtype_COD")]
 res.mca3 <- MCA(MCA3, graph = FALSE)
 fviz_mca_var(res.mca3, repel = TRUE)
 
@@ -35,17 +45,18 @@ fviz_mca_var(res.mca3, repel = TRUE)
 ########## non va 
 ##Filamento Bianco ✚ Genus ✚ Zona (es. Testa, Torace, ecc.)
 
-MCA4 <- DB_MP[, c("White_Filament", "Genus", "Head")]
+MCA4 <- DB_MP_f[, c("White_Filament", "Genus", "Head")]
 res.mca4 <- MCA(MCA4, graph = FALSE)
 fviz_mca_var(res.mca4, repel = TRUE)
 
 ##Filamento Bianco✚ City ✚ Site
-MCA5 <- DB_MP[, c("White_Filament","City", "Site")]
+MCA5 <- DB_MP_f[, c("White_Filament","City", "Site")]
 res.mca5 <- MCA(MCA5, graph = FALSE)
 fviz_mca_var(res.mca5, repel = TRUE)
 
+
 ##Scaglia Bianca ✚ Genus ✚ Scope
-MCA6 <- DB_MP[, c("White_Filament", "Genus", "Scopa")]
+MCA6 <- DB_MP_f[, c("White_Fragment", "Genus", "Scopa")]
 res.mca6 <- MCA(MCA6, graph = FALSE)
 fviz_mca_var(res.mca6, repel = TRUE)
 
@@ -79,12 +90,23 @@ fviz_mca_var(res.mca11, repel = TRUE)
 
 ################## MCA biologia dell'individuo ##################
 ### SONO PIUTTOSTO SICURA CHE NON CI INTERESSINO SAPERE
-## Genus ✚ Sex ✚ dimensione 
-dati_mca <- DB_MP[, c("Genus", "Sex", "Dimensions")]
-res.mca <- MCA(dati_mca, graph = FALSE)
-fviz_mca_var(res.mca, repel = TRUE)
-fviz_mca_ind(res.mca, repel = TRUE)
 
+## TOT MP ✚ SITE ✚ NEST 
+MCA <- DB_MP[, c("Tot_MP", "Site", "Nest")]
+res.mca <- MCA(MCA, graph = FALSE)
+fviz_mca_var(res.mca, repel = TRUE)
+fviz_mca_ind(res.mca, repel = TRUE
+
+##TIPO MP ✚ SITE ✚ NEST 
+MCA44 <- DB_MP[, c("MPtype_COD", "Site", "Nest")]
+res.mca44 <- MCA(MCA44, graph = FALSE)
+fviz_mca_var(res.mca44, repel = TRUE)
+fviz_mca_ind(res.mca44, repel = FALSE)
+fviz_mca_ind(res.mca44, repel = TRUE)
+fviz_mca_biplot(res.mca44, repel = TRUE)
+
+
+## TIPO MP ✚ SITE ✚ NEST 
 ## Genus ✚ Nido ✚ Scope
 dati_mca <- DB_MP[, c("Genus", "Nido", "Scope")]
 res.mca <- MCA(dati_mca, graph = FALSE)
