@@ -1,3 +1,11 @@
+#res.mca1 <- MCA(MCA1, graph = FALSE) crea l'oggetto dell'analisi
+#fviz_mca_var(res.mca1, repel = TRUE) quali categorie sono simili o associate  (nest, tot mp...)
+#fviz_mca_ind(res.mca44, repel = FALSE) Mostra ogni riga del tuo dataset come un punto. Come si distribuiscono le osservazioni rispetto alle categorie
+##CON IND, ESEMPIO= Due punti (individui) vicini → probabilmente hanno categorie simili (es. entrambi sono fiber, urban, Nest1).
+
+#TRUE se vuoi che le etichette non si sovrappongano, più leggibile
+#FALSE si sovrappongono; più pulito se ci sono molti punti o se non servono le etichette
+
 #CONVERTO IN CATEGORIE
 # Crea una copia del database originale
 DB_MP_f <- DB_MP
@@ -6,92 +14,144 @@ DB_MP_f <- DB_MP
 DB_MP_f$MPtype_COD <- as.factor(DB_MP_f$MPtype_COD)
 DB_MP_f$Tot_MP <- as.factor(DB_MP_f$Tot_MP)
 DB_MP_f$Tot_MP <- as.factor(DB_MP_f$White_Filament)
-DB_MP_f$Tot_MP <- as.factor(DB_MP_f$White_Fragment)
+DB_MP_f$Tot_MP <- as.factor(DB_MP_f$Legs)
+DB_MP_f$Tot_MP <- as.factor(DB_MP_f$Head)
 
 ################## MCA Location ##################
 ##City ✚ Site ✚ TOT Microplastiche 
 MCA1 <- DB_MP_f[, c("City", "Site", "Tot_MP")]
 res.mca1 <- MCA(MCA1, graph = FALSE)
 fviz_mca_var(res.mca1, repel = TRUE)
+fviz_mca_ind(res.mca1, repel = FALSE) #NON PENSO CI INTERESSI fviz_mca_ind
+fviz_mca_biplot(res.mca1, repel = FALSE)
 
 ##City ✚ Site ✚ TIPO Microplastiche 
-MCA1 <- DB_MP_f[, c("City", "Site", "MPtype_COD")]
-res.mca1 <- MCA(MCA1, graph = FALSE)
-fviz_mca_var(res.mca1, repel = TRUE)
-
-##City ✚ TIPO Microplastiche ✚ Genus
-MCA2 <-DB_MP_f[, c("City", "MPtype_COD", "Genus")]
+MCA2 <- DB_MP_f[, c("City", "Site", "MPtype_COD")]
 res.mca2 <- MCA(MCA2, graph = FALSE)
 fviz_mca_var(res.mca2, repel = TRUE)
+fviz_mca_ind(res.mca2, repel = FALSE)
+fviz_mca_biplot(res.mca2, repel = FALSE)
 
-##City ✚ Tot MP ✚ Genus
-MCA2 <-DB_MP_f[, c("City", "Tot_MP", "Genus")]
-res.mca2 <- MCA(MCA2, graph = FALSE)
-fviz_mca_var(res.mca2, repel = TRUE)
-
-##Site ✚ Nido ✚ TOT Microplastiche
-MCA3 <- DB_MP_f[, c("Site", "Nest", "Tot_MP")]
-res.mca3 <- MCA(MCA3, graph = FALSE)
+##City ✚ Site ✚ TIPO Microplastiche ✚ Genus
+MCA3 <- DB_MP_f[, c("City", "Site", "MPtype_COD", "Genus")]
+res.mca2 <- MCA(MCA3, graph = FALSE)
 fviz_mca_var(res.mca3, repel = TRUE)
+fviz_mca_ind(res.mca3, repel = FALSE)
+fviz_mca_biplot(res.mca3, repel = FALSE)
 
-##Site ✚ Nido ✚ TIPO Microplastiche
-MCA3 <- DB_MP_f[, c("Site", "Nest", "MPtype_COD")]
-res.mca3 <- MCA(MCA3, graph = FALSE)
-fviz_mca_var(res.mca3, repel = TRUE)
+##City ✚ Site ✚ TOT Microplastiche ✚ Genus
+MCA4 <- DB_MP_f[, c("City", "Site", "Tot_MP", "Genus")]
+res.mca4 <- MCA(MCA4, graph = FALSE)
+fviz_mca_var(res.mca4, repel = TRUE)
+fviz_mca_ind(res.mca4, repel = FALSE)
+fviz_mca_biplot(res.mca4, repel = FALSE)
 
+##City ✚ Tot MP ✚ DImensioni ##Si potrebbe fare anche con Site? al posto di City o aggiungerla come variabile?
+MCA5 <-DB_MP_f[, c("City", "Tot_MP", "Dimensions")]
+res.mca5 <- MCA(MCA5, graph = FALSE)
+fviz_mca_var(res.mca5, repel = TRUE)
+fviz_mca_ind(res.mca5, repel = FALSE)
+fviz_mca_biplot(res.mca5, repel = FALSE)
 
+##City ✚ TIPO Microplastiche ✚ Dimensioni ##Si potrebbe fare anche con Site? al posto di City o aggiungerla come variabile?
+MCA6 <-DB_MP_f[, c("City", "MPtype_COD", "Dimensions")]
+res.mca6 <- MCA(MCA6, graph = FALSE)
+fviz_mca_var(res.mca6, repel = TRUE)
+fviz_mca_ind(res.mca6, repel = FALSE)
+fviz_mca_biplot(res.mca6, repel = FALSE)
+
+##City ✚ TOT Microplastiche ✚ Nido ##Si potrebbe fare anche con Site? al posto di City o aggiungerla come variabile?
+MCA7 <- DB_MP_f[, c("City", "Nest", "Tot_MP")]
+MCA7 <- MCA7[!is.na(MCA8$Nest),] #SECONDO ME HA SENSO TOGLIERE GLI NA 
+res.mca7 <- MCA(MCA7, graph = FALSE)
+fviz_mca_var(res.mca7, repel = TRUE)
+fviz_mca_ind(res.mca7, repel = FALSE)
+fviz_mca_biplot(res.mca7, repel = FALSE)
+
+##City ✚ TOT Microplastiche ✚ Nido ✚ Sex ##E' meglio se seleziono solo le femmine? 
+MCA8 <- DB_MP_f[, c("City", "Nest", "Tot_MP", "Sex")]
+MCA8 <- MCA8[!is.na(MCA8$Nest),] #SECONDO ME HA SENSO TOGLIERE GLI NA 
+MCA8 <- MCA8[!is.na(MCA8$Sex),] #SECONDO ME HA SENSO TOGLIERE GLI NA 
+res.mca8 <- MCA(MCA8, graph = FALSE)
+fviz_mca_var(res.mca8, repel = TRUE)
+fviz_mca_ind(res.mca8, repel = FALSE)
+fviz_mca_biplot(res.mca8, repel = FALSE)
+
+##City ✚ TIPO Microplastiche ✚ Nido ##Si potrebbe fare anche con Site? al posto di City o aggiungerla come variabile?
+MCA9 <- DB_MP_f[, c("City", "Nest", "MPtype_COD")]
+MCA9 <- MCA9[!is.na(MCA9$Nest),] #SECONDO ME HA SENSO TOGLIERE GLI NA 
+res.mca3 <- MCA(MCA9, graph = FALSE)
+fviz_mca_var(res.mca9, repel = TRUE)
+fviz_mca_ind(res.mca9, repel = FALSE)
+fviz_mca_biplot(res.mca9, repel = FALSE)
+
+##City ✚ TOT Microplastiche ✚ Sesso ##Si potrebbe fare anche con Site? al posto di City o aggiungerla come variabile?
+MCA10 <- DB_MP_f[, c("City", "Sex", "Tot_MP")]
+MCA10 <- MCA10[!is.na(MCA10$Sex),] #SECONDO ME HA SENSO TOGLIERE GLI NA 
+res.mca10 <- MCA(MCA10, graph = FALSE)
+fviz_mca_var(res.mca10, repel = TRUE)
+fviz_mca_ind(res.mca10, repel = FALSE)
+fviz_mca_biplot(res.mca10, repel = FALSE)
+
+##City ✚ TIPO Microplastiche ✚ Sesso ##Si potrebbe fare anche con Site? al posto di City o aggiungerla come variabile?
+MCA11<- DB_MP_f[, c("City", "Sex", "MPtype_COD")]
+MCA11 <- MCA11[!is.na(MCA11$Sex),] #SECONDO ME HA SENSO TOGLIERE GLI NA 
+res.mca11 <- MCA(MCA11, graph = FALSE)
+fviz_mca_var(res.mca11, repel = TRUE)
+fviz_mca_ind(res.mca11, repel = FALSE)
+fviz_mca_biplot(res.mca11, repel = FALSE)
 
 ################## MCA tipo di MP ##################
-########## non va 
-##Filamento Bianco ✚ Genus ✚ Zona (es. Testa, Torace, ecc.)
 
+##Filamento Bianco ✚ Genus ✚ Zona (es. Testa, Torace, ecc.)
 MCA4 <- DB_MP_f[, c("White_Filament", "Genus", "Head")]
 res.mca4 <- MCA(MCA4, graph = FALSE)
 fviz_mca_var(res.mca4, repel = TRUE)
 
-##Filamento Bianco✚ City ✚ Site
-MCA5 <- DB_MP_f[, c("White_Filament","City", "Site")]
-res.mca5 <- MCA(MCA5, graph = FALSE)
-fviz_mca_var(res.mca5, repel = TRUE)
+##Filamento Bianco ✚ Dimensioni ✚ Zona (es. Testa, Torace, ecc.)
+MCA4 <- DB_MP_f[, c("White_Filament", "Dimensions", "Head")]
+res.mca4 <- MCA(MCA4, graph = FALSE)
+fviz_mca_var(res.mca4, repel = TRUE)
 
+##Filamento Bianco ✚ Nido ✚ Zona (es. Testa, Torace, ecc.)
+MCA4 <- DB_MP_f[, c("White_Filament", "Nest", "Head")]
+res.mca4 <- MCA(MCA4, graph = FALSE)
+fviz_mca_var(res.mca4, repel = TRUE)
 
-##Scaglia Bianca ✚ Genus ✚ Scope
-MCA6 <- DB_MP_f[, c("White_Fragment", "Genus", "Scopa")]
-res.mca6 <- MCA(MCA6, graph = FALSE)
-fviz_mca_var(res.mca6, repel = TRUE)
+##Filamento Bianco ✚ Scopa ✚ Zona (es. Testa, Torace, ecc.)
+MCA4 <- DB_MP_f[, c("White_Filament", "Scopa", "Head")]
+res.mca4 <- MCA(MCA4, graph = FALSE)
+fviz_mca_var(res.mca4, repel = TRUE)
 
-################## MCA Distribuzione del corpo ##################
-########### non va ###########
-##Testa ✚ Torace ✚ Zampe
-MCA7 <- DB_MP[, c("Head", "Torax", "Legs", "Abdomen", "Wings")]
-res.mca7 <- MCA(MCA7, graph = FALSE)
-fviz_mca_var(res.mca7, repel = TRUE)
+##Filamento Bianco ✚ Genus ✚ Zona (LEGS)
+MCA4 <- DB_MP_f[, c("White_Filament", "Genus", "Legs")]
+res.mca4 <- MCA(MCA4, graph = FALSE)
+fviz_mca_var(res.mca4, repel = TRUE)
 
-##TOT_MP ✚ Dimensione ✚ Genus ✚ Sex
-MCA8 <- DB_MP[, c("Genus", "Dimensions", "Sex", "Tot_MP")]
-res.mca8 <- MCA(MCA8, graph = FALSE)
-fviz_mca_var(res.mca8, repel = TRUE)
+##Filamento Bianco ✚ Dimensioni ✚ Zona (LEGS)
+MCA4 <- DB_MP_f[, c("White_Filament", "Dimensions", "Legs")]
+res.mca4 <- MCA(MCA4, graph = FALSE)
+fviz_mca_var(res.mca4, repel = TRUE)
 
-################## MCA Mix ##################
-##Genus ✚ City ✚ Totale Microplastiche
-MCA9 <- DB_MP[, c("Genus", "City", "Tot_MP")]
-res.mca9 <- MCA(MCA9, graph = FALSE)
-fviz_mca_var(res.mca9, repel = TRUE)
+##Filamento Bianco ✚ Nido ✚ Zona (LEGS)
+MCA4 <- DB_MP_f[, c("White_Filament", "Nest", "Legs")]
+res.mca4 <- MCA(MCA4, graph = FALSE)
+fviz_mca_var(res.mca4, repel = TRUE)
 
-##Genus ✚ City ✚ Totale Microplastiche ✚ Site
-MCA10 <- DB_MP[, c("Genus", "City", "Tot_MP", "Site")]
-res.mca10 <- MCA(MCA10, graph = FALSE)
-fviz_mca_var(res.mca10, repel = TRUE)
+##Filamento Bianco ✚ Scopa ✚ Zona (LEGS)
+MCA4 <- DB_MP_f[, c("White_Filament", "Scopa", "Legs")]
+res.mca4 <- MCA(MCA4, graph = FALSE)
+fviz_mca_var(res.mca4, repel = TRUE)
 
-##N° MP per campione ✚ city ✚ Dimensione ✚ Siti ✚ Genus
-MCA11 <- DB_MP[, c("MPtype_COD", "City", "Dimensions", "Site", "Genus")]
-res.mca11 <- MCA(MCA11, graph = FALSE)
-fviz_mca_var(res.mca11, repel = TRUE)
+##Filamento Bianco ✚ Sesso ✚ Zona (LEGS)
+MCA4 <- DB_MP_f[, c("White_Filament", "Sex", "Legs")]
+res.mca4 <- MCA(MCA4, graph = FALSE)
+fviz_mca_var(res.mca4, repel = TRUE)
 
-################## MCA biologia dell'individuo ##################
-### SONO PIUTTOSTO SICURA CHE NON CI INTERESSINO SAPERE
+################## MCA random ##################
+###SONO PIUTTOSTO SICURA CHE NON CI INTERESSINO SAPERE
 
-## TOT MP ✚ SITE ✚ NEST 
+##TOT MP ✚ SITE ✚ NEST 
 MCA <- DB_MP[, c("Tot_MP", "Site", "Nest")]
 res.mca <- MCA(MCA, graph = FALSE)
 fviz_mca_var(res.mca, repel = TRUE)
@@ -102,20 +162,9 @@ MCA44 <- DB_MP[, c("MPtype_COD", "Site", "Nest")]
 res.mca44 <- MCA(MCA44, graph = FALSE)
 fviz_mca_var(res.mca44, repel = TRUE)
 fviz_mca_ind(res.mca44, repel = FALSE)
-fviz_mca_ind(res.mca44, repel = TRUE)
+
 fviz_mca_biplot(res.mca44, repel = TRUE)
 
-
-## TIPO MP ✚ SITE ✚ NEST 
-## Genus ✚ Nido ✚ Scope
-dati_mca <- DB_MP[, c("Genus", "Nido", "Scope")]
-res.mca <- MCA(dati_mca, graph = FALSE)
-fviz_mca_var(res.mca, repel = TRUE)
-
-##Genus ✚ Sex ✚ Scope
-dati_mca <- DB_MP[, c("Genus", "Sex", "Scope")]
-res.mca <- MCA(dati_mca, graph = FALSE)
-fviz_mca_var(res.mca, repel = TRUE)
 
 
 
