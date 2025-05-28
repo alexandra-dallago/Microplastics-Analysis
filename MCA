@@ -11,11 +11,11 @@
 DB_MP_f <- DB_MP
 
 # Converte le colonne MPtype_COD e Tot_MP in fattori
-DB_MP_f$MPtype_COD <- as.factor(DB_MP_f$MPtype_COD)
-DB_MP_f$Tot_MP <- as.factor(DB_MP_f$Tot_MP)
-DB_MP_f$Tot_MP <- as.factor(DB_MP_f$White_Filament)
-DB_MP_f$Tot_MP <- as.factor(DB_MP_f$Legs)
-DB_MP_f$Tot_MP <- as.factor(DB_MP_f$Head)
+DB_MP_f$MPtype_COD     <- as.factor(DB_MP_f$MPtype_COD)
+DB_MP_f$Tot_MP         <- as.factor(DB_MP_f$Tot_MP)
+DB_MP_f$White_Filament <- as.factor(DB_MP_f$White_Filament)
+DB_MP_f$Legs           <- as.factor(DB_MP_f$Legs)
+DB_MP_f$Head           <- as.factor(DB_MP_f$Head)
 
 ################## MCA Location ##################
 ##City ✚ Site ✚ TOT Microplastiche 
@@ -103,50 +103,72 @@ fviz_mca_biplot(res.mca11, repel = FALSE)
 
 ################## MCA tipo di MP ##################
 
-##Filamento Bianco ✚ Genus ✚ Zona (es. Testa, Torace, ecc.)
-MCA4 <- DB_MP_f[, c("White_Filament", "Genus", "Head")]
-res.mca4 <- MCA(MCA4, graph = FALSE)
-fviz_mca_var(res.mca4, repel = TRUE)
+##Filamento Bianco ✚ Genus ✚ Zona (Testa)
+MCA12 <- DB_MP_f[, c("White_Filament", "Genus", "Head")]
+res.mca12 <- MCA(MCA12, graph = FALSE)
+fviz_mca_var(res.mca12, repel = TRUE)
+fviz_mca_ind(res.mca12, repel = FALSE)
+fviz_mca_biplot(res.mca12, repel = FALSE)
 
-##Filamento Bianco ✚ Dimensioni ✚ Zona (es. Testa, Torace, ecc.)
-MCA4 <- DB_MP_f[, c("White_Filament", "Dimensions", "Head")]
-res.mca4 <- MCA(MCA4, graph = FALSE)
-fviz_mca_var(res.mca4, repel = TRUE)
+##Filamento Bianco ✚ Dimensioni ✚ Zona (Testa)
+MCA13 <- DB_MP_f[, c("White_Filament", "Dimensions", "Head")]
+res.mca13<- MCA(MCA13, graph = FALSE)
+fviz_mca_var(res.mca13, repel = TRUE)
+fviz_mca_ind(res.mca13, repel = FALSE)
+fviz_mca_biplot(res.mca13, repel = FALSE)
 
-##Filamento Bianco ✚ Nido ✚ Zona (es. Testa, Torace, ecc.)
-MCA4 <- DB_MP_f[, c("White_Filament", "Nest", "Head")]
-res.mca4 <- MCA(MCA4, graph = FALSE)
-fviz_mca_var(res.mca4, repel = TRUE)
+##Filamento Bianco ✚ Nido ✚ Zona (Testa)
+MCA14 <- DB_MP_f[, c("White_Filament", "Nest", "Head")]
+MCA14 <- MCA14[!is.na(MCA14$Nest),] #SECONDO ME HA SENSO TOGLIERE GLI NA 
+res.mca14 <- MCA(MCA14, graph = FALSE)
+fviz_mca_var(res.mca14, repel = TRUE)
+fviz_mca_ind(res.mca14, repel = FALSE)
+fviz_mca_biplot(res.mca14, repel = FALSE)
 
 ##Filamento Bianco ✚ Scopa ✚ Zona (es. Testa, Torace, ecc.)
-MCA4 <- DB_MP_f[, c("White_Filament", "Scopa", "Head")]
-res.mca4 <- MCA(MCA4, graph = FALSE)
-fviz_mca_var(res.mca4, repel = TRUE)
+MCA15 <- DB_MP_f[, c("White_Filament", "Scopa", "Head")]
+MCA15 <- MCA15[!is.na(MCA15$Scopa),] #SECONDO ME HA SENSO TOGLIERE GLI NA 
+res.mca15<- MCA(MCA15, graph = FALSE)
+fviz_mca_var(res.mca15, repel = TRUE)
+fviz_mca_ind(res.mca15, repel = FALSE)
+fviz_mca_biplot(res.mca15, repel = FALSE)
 
 ##Filamento Bianco ✚ Genus ✚ Zona (LEGS)
-MCA4 <- DB_MP_f[, c("White_Filament", "Genus", "Legs")]
-res.mca4 <- MCA(MCA4, graph = FALSE)
-fviz_mca_var(res.mca4, repel = TRUE)
+MCA16 <- DB_MP_f[, c("White_Filament", "Genus", "Legs")]
+res.mca16 <- MCA(MCA16, graph = FALSE)
+fviz_mca_var(res.mca16, repel = TRUE)
+fviz_mca_ind(res.mca16, repel = FALSE)
+fviz_mca_biplot(res.mca16, repel = FALSE)
 
 ##Filamento Bianco ✚ Dimensioni ✚ Zona (LEGS)
-MCA4 <- DB_MP_f[, c("White_Filament", "Dimensions", "Legs")]
-res.mca4 <- MCA(MCA4, graph = FALSE)
-fviz_mca_var(res.mca4, repel = TRUE)
+MCA17 <- DB_MP_f[, c("White_Filament", "Dimensions", "Legs")]
+res.mca17 <- MCA(MCA17, graph = FALSE)
+fviz_mca_var(res.mca17, repel = TRUE)
+fviz_mca_ind(res.mca17, repel = FALSE)
+fviz_mca_biplot(res.mca17, repel = FALSE)
 
 ##Filamento Bianco ✚ Nido ✚ Zona (LEGS)
-MCA4 <- DB_MP_f[, c("White_Filament", "Nest", "Legs")]
-res.mca4 <- MCA(MCA4, graph = FALSE)
-fviz_mca_var(res.mca4, repel = TRUE)
+MCA18 <- DB_MP_f[, c("White_Filament", "Nest", "Legs")]
+MCA18 <- MCA18[!is.na(MCA18$Nest),] #SECONDO ME HA SENSO TOGLIERE GLI NA 
+res.mca18 <- MCA(MCA18, graph = FALSE)
+fviz_mca_var(res.mca18, repel = TRUE)
+fviz_mca_ind(res.mca18, repel = FALSE)
+fviz_mca_biplot(res.mca18, repel = FALSE)
 
 ##Filamento Bianco ✚ Scopa ✚ Zona (LEGS)
-MCA4 <- DB_MP_f[, c("White_Filament", "Scopa", "Legs")]
-res.mca4 <- MCA(MCA4, graph = FALSE)
-fviz_mca_var(res.mca4, repel = TRUE)
+MCA19 <- DB_MP_f[, c("White_Filament", "Scopa", "Legs")]
+MCA19 <- MCA19[!is.na(MCA19$Scopa),] #SECONDO ME HA SENSO TOGLIERE GLI NA 
+res.mca19<- MCA(MCA19, graph = FALSE)
+fviz_mca_var(res.mca19, repel = TRUE)
+fviz_mca_ind(res.mca19, repel = FALSE)
+fviz_mca_biplot(res.mca19, repel = FALSE)
 
 ##Filamento Bianco ✚ Sesso ✚ Zona (LEGS)
-MCA4 <- DB_MP_f[, c("White_Filament", "Sex", "Legs")]
-res.mca4 <- MCA(MCA4, graph = FALSE)
-fviz_mca_var(res.mca4, repel = TRUE)
+MCA20 <- DB_MP_f[, c("White_Filament", "Sex", "Legs")]
+res.mca20 <- MCA(MCA20, graph = FALSE)
+fviz_mca_var(res.mca20, repel = TRUE)
+fviz_mca_ind(res.mca20, repel = FALSE)
+fviz_mca_biplot(res.mca20, repel = FALSE)
 
 ################## MCA random ##################
 ###SONO PIUTTOSTO SICURA CHE NON CI INTERESSINO SAPERE
@@ -158,11 +180,10 @@ fviz_mca_var(res.mca, repel = TRUE)
 fviz_mca_ind(res.mca, repel = TRUE
 
 ##TIPO MP ✚ SITE ✚ NEST 
-MCA44 <- DB_MP[, c("MPtype_COD", "Site", "Nest")]
-res.mca44 <- MCA(MCA44, graph = FALSE)
+MCA <- DB_MP[, c("MPtype_COD", "Site", "Nest")]
+res.mca <- MCA(MCA44, graph = FALSE)
 fviz_mca_var(res.mca44, repel = TRUE)
 fviz_mca_ind(res.mca44, repel = FALSE)
-
 fviz_mca_biplot(res.mca44, repel = TRUE)
 
 
