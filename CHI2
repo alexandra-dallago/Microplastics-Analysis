@@ -1,33 +1,27 @@
+#HO ipotesi nulla = INDIPENDENTI
+#p.value <0.05 = RIFIUTI HO = dipendenti (c'è influenza)
+#p.value >0.05 INDIPENDENTI 
 
-################## TIPO DI MP PER GENERE ##################
-DB_clean <- DB_MP %>% filter(!is.na(Genus), !is.na(Sex))
-tabella1 <- table(DB_clean$Genus, DB_clean$Sex)
-chisq.test(tabella1)
+#NB: si può fare anche l'analisi dei residui standardizzati con: residui_std <- residui / sqrt(1 - hatvalues(chi2))
+
+################## TIPO DI MP PER SITO ##################
+tab1 <- table(DB_MP$Tot_MP, DB_MP_f$Site) #TABELLA DI CONTINGENZA
+chi2_1 <- chisq.test(tab1) # Esegui il test del chi-quadro
+chi2_1 # p-value = 0.001651 --> rifiuti h0 
+
+residui1 <- chi2_1$residuals #Analisi dei residui di Pearson
+residui1
+
+ggplot(as.data.frame(as.table(residui1)), aes(Var1, Var2, fill = Freq)) +
++     geom_tile() +
++     geom_text(aes(label=round(Freq,2)), color="black") +
++     scale_fill_gradient2(midpoint = 0, low = "blue", mid = "white", high = "red") +
++     theme_minimal() +
++     labs(title = "Residui del test del chi-quadro", x = "Tot_MP", y = "Site")
+
+any(tab1<5)
+fisher.test(tab1, simulate.p.value = TRUE, B = 1e5) #FISHER-MONTECARLO Perchè la tab contingenza <5; montecarlo perchè la tab è troppo grande 
+#p-value = 0.0017
 
 
-tabella1 <- table(DB_clean$MPtype_COD, DB_clean$Genus)
-print(tabella1)
-
-## H0 (nessuna associazione)
-## H1 (c’è associazione)
-
-testchi2_1<- chisq.test(tabella1)
-testchi2_1
-#p.value < 0.05 = rifiuti H0 ; c’è associazione significativa.
-#p.value > non rifiuti H0 ; nessuna evidenza di associazione.
-
-#Grafico 
-library(ggplot2)
-library(dplyr)
-df_plot <- DB_MP %>%
-  filter(!is.na(Genus), !is.na(Sex)) %>%
-  group_by(Genus, Sex) %>%
-  summarise(count = n()) %>%
-  mutate(freq = count / sum(count))
-ggplot(df_plot, aes(x = Genus, y = count, fill = Sex)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  theme_minimal() +
-  labs(title = "Distribuzione Genus per Sex", y = "Conteggio", x = "Genus")
-
-################## TIPO DI MP PER GENERE ##################
 
