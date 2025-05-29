@@ -1,3 +1,13 @@
+#PER SAPERE IL LIVELLO DI RIFERIMENTO
+levels(mydata$Genus)
+levels(mydata$City)
+levels(mydata$Sex)
+levels(mydata$Nest)
+levels(mydata$Scopa)
+
+#PER IMPOSTARE IL RIFERIMENTO
+mydata$Genus <- relevel(mydata$Genus, ref = "Apis")
+
 ##################################### TOT MP per città #####################################
 GLM1<- glm(Tot_MP ~ City + Site, data = DB_MP, family = poisson(log))
 summary(GLM1) #per vedere se i coeff sono significativi 
@@ -12,8 +22,7 @@ results1 <- data.frame(
   Coefficient = names(coefs1),
   Estimate = round(coefs1, 4),
   Exp_Estimate = round(exp_coefs1, 4),
-  Percent_Change = round(perc_change, 2)
-)
+  Percent_Change = round(perc_change1, 2))
 results1
 
 #GRAFICO
@@ -24,13 +33,9 @@ ggplot(GRAF_GLM1, aes(x = reorder(term, estimate), y = estimate)) +
   geom_point(color = "blue", size = 3) +
   geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.2, color = "blue") +
   geom_hline(yintercept = 0, linetype = "dashed") +
-  coord_flip() +
-  labs(
-    title = "Coefficienti GLM con intervalli di confidenza (scala log)",
+  coord_flip() +  labs( title = "Coefficienti GLM con intervalli di confidenza (scala log)",
     x = "Termini del modello",
-    y = "Coefficiente stimato (log scale)"
-  ) +
-  theme_minimal()
+    y = "Coefficiente stimato (log scale)" ) + theme_minimal()
 
 #OVERDISPERSIONE 
 dispersion_ratio1 <- deviance(GLM1) / df.residual(GLM1) # Deviance residual / df residui
@@ -41,24 +46,355 @@ QP_GLM1 <- glm(Tot_MP ~ City + Site, data = DB_MP, family = quasipoisson(link = 
 summary(QP_GLM1) #dispersione di 2.78 --> vicino a 1 --> ok quasi-poisson
 
 #INTERVALLI DI CONFIDENZA APPROSSIMATI
-coefs1 <- summary(GLM_quasi)$coefficients   
+coefs1 <- summary(QP_GLM1)$coefficients   
 conf_intervals1 <- data.frame(
   term = rownames(coefs1),
   estimate = coefs1[, "Estimate"],
   std_error = coefs1[, "Std. Error"],
   conf_low = coefs1[, "Estimate"] - 1.96 * coefs1[, "Std. Error"],
-  conf_high = coefs1[, "Estimate"] + 1.96 * coefs1[, "Std. Error"]
-)
+  conf_high = coefs1[, "Estimate"] + 1.96 * coefs1[, "Std. Error"] )
 
 #GRAFICO 
 ggplot(conf_intervals1, aes(x = reorder(term, estimate), y = estimate)) +
   geom_point(color = "darkgreen", size = 3) +
   geom_errorbar(aes(ymin = conf_low, ymax = conf_high), width = 0.2, color = "darkgreen") +
   geom_hline(yintercept = 0, linetype = "dashed") +
-  coord_flip() +
-  labs(
-    title = "Coefficienti GLM (quasi-Poisson) con intervalli di confidenza (scala log)",
+  coord_flip() +  labs( title = "Coefficienti GLM (quasi-Poisson) con intervalli di confidenza (scala log)",
     x = "Termini del modello",
-    y = "Coefficiente stimato (scala log)"
-  ) +
-  theme_minimal()
+    y = "Coefficiente stimato (scala log)" ) + theme_minimal()
+
+##################################### TIPO MP per città #####################################
+GLM2<- glm(MPtype_COD ~ City + Site, data = DB_MP, family = poisson(log))
+summary(GLM2) 
+confint(GLM2)    
+
+#RISULTATI IN PERCENTUALE 
+coefs2 <- coef(GLM2) 
+exp_coefs2 <- exp(coefs2) 
+perc_change2 <- (exp_coefs2 - 1) * 100 
+results2 <- data.frame(Coefficient = names(coefs2),
+  Estimate = round(coefs2, 4),
+  Exp_Estimate = round(exp_coefs2, 4),
+  Percent_Change = round(perc_change2, 2))
+results2
+
+#GRAFICO
+GRAF_GLM2<- broom::tidy(GLM2, conf.int = TRUE)
+#GRAF_GLM2 <- tidy_glm[GRAF_GLM2$term != "(Intercept)", ] #Rimuovi intercetta se vuoi
+
+ggplot(GRAF_GLM2, aes(x = reorder(term, estimate), y = estimate)) +
+  geom_point(color = "blue", size = 3) + geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.2, color = "blue") +
+  geom_hline(yintercept = 0, linetype = "dashed") + coord_flip() + labs(title = "Coefficienti GLM con intervalli di confidenza (scala log)",
+    x = "Termini del modello", y = "Coefficiente stimato (log scale)") + theme_minimal()
+
+#OVERDISPERSIONE !!!!!!!!!!!!!!!!!!!!!!!!!!!
+dispersion_ratio2 <- deviance(GLM2) / df.residual(GLM2) 
+dispersion_ratio2 # [1] 0.5325949 = VAR minore rispetto a quella attesa
+
+##################################### TIPO MP x FATTORI ECOLOGICI #####################################
+GLM3<- glm(MPtype_COD ~ City + Site + Genus + Sex + Nest + Scopa + Dimensions, data = DB_MP, family = poisson(log))
+summary(GLM3) 
+confint(GLM3)  
+
+#RISULTATI IN PERCENTUALE 
+coefs3 <- coef(GLM3) 
+exp_coefs3 <- exp(coefs3) 
+perc_change3 <- (exp_coefs3 - 1) * 100 
+results3 <- data.frame(Coefficient = names(coefs3),
+  Estimate = round(coefs3, 4),
+  Exp_Estimate = round(exp_coefs3, 4),
+  Percent_Change = round(perc_change3, 2))
+results3
+
+#GRAFICO
+GRAF_GLM3<- broom::tidy(GLM3, conf.int = TRUE)
+#GRAF_GLM3 <- tidy_glm[GRAF_GLM3$term != "(Intercept)", ] #Rimuovi intercetta se vuoi
+
+ggplot(GRAF_GLM3, aes(x = reorder(term, estimate), y = estimate)) +
+  geom_point(color = "blue", size = 3) + geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.2, color = "blue") +
+  geom_hline(yintercept = 0, linetype = "dashed") + coord_flip() + labs(title = "Coefficienti GLM con intervalli di confidenza (scala log)",
+    x = "Termini del modello", y = "Coefficiente stimato (log scale)") + theme_minimal()
+
+#OVERDISPERSIONE!!!!!!!!!!!!!!!!!!!!!!!!!
+dispersion_ratio3 <- deviance(GLM3) / df.residual(GLM3) 
+dispersion_ratio3 # [1] 0.4419342 = sotto dispersione, VAR<ATTESA
+
+##################################### TOT MP FATTORI ECOLOGICI #####################################
+GLM4<- glm(Tot_MP ~ City + Site + Genus + Sex + Nest + Scopa + Dimensions, data = DB_MP, family = poisson(log))
+summary(GLM4) #per vedere se i coeff sono significativi 
+confint(GLM4)    #Intervalli di confidenza
+
+#RISULTATI IN PERCENTUALE 
+coefs4 <- coef(GLM4) 
+exp_coefs4 <- exp(coefs4) 
+perc_change4 <- (exp_coefs4 - 1) * 100 
+results4 <- data.frame(Coefficient = names(coefs4),
+  Estimate = round(coefs4, 4),
+  Exp_Estimate = round(exp_coefs4, 4),
+  Percent_Change = round(perc_change4, 2))
+results4
+
+#GRAFICO
+GRAF_GLM4<- broom::tidy(GLM4, conf.int = TRUE)
+#GRAF_GLM4 <- tidy_glm[GRAF_GLM4$term != "(Intercept)", ] #Rimuovi intercetta se vuoi
+
+ggplot(GRAF_GLM4, aes(x = reorder(term, estimate), y = estimate)) +
+  geom_point(color = "blue", size = 3) + geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.2, color = "blue") +
+  geom_hline(yintercept = 0, linetype = "dashed") + coord_flip() + labs(title = "Coefficienti GLM con intervalli di confidenza (scala log)",
+    x = "Termini del modello", y = "Coefficiente stimato (log scale)") + theme_minimal()
+
+#OVERDISPERSIONE 
+dispersion_ratio4 <- deviance(GLM4) / df.residual(GLM4) 
+dispersion_ratio4 # [1] 1.497636 = sovra dispersione, VAR>ATTESA
+
+#MODELLO QUASI-POISSON 
+QP_GLM4 <- glm(Tot_MP ~ City + Site + Genus + Sex + Nest + Scopa + Dimensions, data = DB_MP, family = quasipoisson(link = "log"))
+summary(QP_GLM4) 
+
+#INTERVALLI DI CONFIDENZA APPROSSIMATI
+coefs4 <- summary(QP_GLM4)$coefficients   
+conf_intervals4 <- data.frame(
+  term = rownames(coefs4),
+  estimate = coefs4[, "Estimate"],
+  std_error = coefs4[, "Std. Error"],
+  conf_low = coefs4[, "Estimate"] - 1.96 * coefs1[, "Std. Error"],
+  conf_high = coefs4[, "Estimate"] + 1.96 * coefs1[, "Std. Error"])
+
+#GRAFICO 
+ggplot(conf_intervals4, aes(x = reorder(term, estimate), y = estimate)) +
+  geom_point(color = "darkgreen", size = 3) +
+  geom_errorbar(aes(ymin = conf_low, ymax = conf_high), width = 0.2, color = "darkgreen") +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  coord_flip() + labs( title = "Coefficienti GLM (quasi-Poisson) con intervalli di confidenza (scala log)",
+    x = "Termini del modello",
+    y = "Coefficiente stimato (scala log)" ) +  theme_minimal()
+
+##################################### TOT MP FATTORI ECOLOGICI #####################################
+GLM5<- glm(Tot_MP ~ City + Site + Genus + Sex + Nest + Scopa + Dimensions, data = DB_MP, family = poisson(log))
+summary(GLM5) #per vedere se i coeff sono significativi 
+confint(GLM5)    #Intervalli di confidenza
+
+#RISULTATI IN PERCENTUALE 
+coefs5 <- coef(GLM5) 
+exp_coefs5 <- exp(coefs5) 
+perc_change5 <- (exp_coefs5 - 1) * 100 
+results5 <- data.frame(Coefficient = names(coefs5),
+  Estimate = round(coefs5, 4),
+  Exp_Estimate = round(exp_coefs5, 4),
+  Percent_Change = round(perc_change5, 2))
+results5
+
+#GRAFICO
+GRAF_GLM5<- broom::tidy(GLM5, conf.int = TRUE)
+#GRAF_GLM5 <- tidy_glm[GRAF_GLM5$term != "(Intercept)", ] #Rimuovi intercetta se vuoi
+
+ggplot(GRAF_GLM5, aes(x = reorder(term, estimate), y = estimate)) +
+  geom_point(color = "blue", size = 3) + geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.2, color = "blue") +
+  geom_hline(yintercept = 0, linetype = "dashed") + coord_flip() + labs(title = "Coefficienti GLM con intervalli di confidenza (scala log)",
+    x = "Termini del modello", y = "Coefficiente stimato (log scale)") + theme_minimal()
+
+#OVERDISPERSIONE 
+dispersion_ratio5 <- deviance(GLM5) / df.residual(GLM5) 
+dispersion_ratio5 # [1] 1.497636 = sovra dispersione, VAR>ATTESA
+
+#MODELLO QUASI-POISSON 
+QP_GLM5 <- glm(Tot_MP ~ City + Site + Genus + Sex + Nest + Scopa + Dimensions, data = DB_MP, family = quasipoisson(link = "log"))
+summary(QP_GLM5)
+
+#INTERVALLI DI CONFIDENZA APPROSSIMATI
+coefs5 <- summary(QP_GLM5)$coefficients   
+conf_intervals4 <- data.frame(
+  term = rownames(coefs5),
+  estimate = coefs5[, "Estimate"],
+  std_error = coefs5[, "Std. Error"],
+  conf_low = coefs5[, "Estimate"] - 1.96 * coefs1[, "Std. Error"],
+  conf_high = coefs5[, "Estimate"] + 1.96 * coefs1[, "Std. Error"])
+
+#GRAFICO 
+ggplot(conf_intervals5, aes(x = reorder(term, estimate), y = estimate)) +
+  geom_point(color = "darkgreen", size = 3) +
+  geom_errorbar(aes(ymin = conf_low, ymax = conf_high), width = 0.2, color = "darkgreen") +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  coord_flip() + labs( title = "Coefficienti GLM (quasi-Poisson) con intervalli di confidenza (scala log)",
+    x = "Termini del modello",
+    y = "Coefficiente stimato (scala log)" ) +  theme_minimal()
+
+#################################### TOT MP e Genus + Dimensions + Nest #####################################
+GLM6<- glm(Tot_MP ~ City + Site + Genus + Dimensions + Nest, data = DB_MP, family = poisson(log))
+summary(GLM6) 
+confint(GLM6)    
+
+#RISULTATI IN PERCENTUALE 
+coefs6 <- coef(GLM6) 
+exp_coefs6 <- exp(coefs6) 
+perc_change6 <- (exp_coefs6 - 1) * 100 
+results6 <- data.frame(Coefficient = names(coefs6),
+  Estimate = round(coefs6, 4),
+  Exp_Estimate = round(exp_coefs6, 4),
+  Percent_Change = round(perc_change6, 2))
+results6
+
+#GRAFICO
+GRAF_GLM6<- broom::tidy(GLM6, conf.int = TRUE)
+#GRAF_GLM6 <- tidy_glm[GRAF_GLM6$term != "(Intercept)", ] #Rimuovi intercetta se vuoi
+
+ggplot(GRAF_GLM6, aes(x = reorder(term, estimate), y = estimate)) +
+  geom_point(color = "blue", size = 3) + geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.2, color = "blue") +
+  geom_hline(yintercept = 0, linetype = "dashed") + coord_flip() + labs(title = "Coefficienti GLM con intervalli di confidenza (scala log)",
+    x = "Termini del modello", y = "Coefficiente stimato (log scale)") + theme_minimal()
+
+#OVERDISPERSIONE 
+dispersion_ratio6 <- deviance(GLM6) / df.residual(GLM6) 
+dispersion_ratio6 # [1] 1.495692 = sovra dispersione, VAR>ATTESA
+
+#MODELLO QUASI-POISSON 
+QP_GLM6 <- glm(Tot_MP ~ City + Site + Genus + Dimensions + Nest, data = DB_MP, family = quasipoisson(link = "log"))
+summary(QP_GLM6) 
+
+#INTERVALLI DI CONFIDENZA APPROSSIMATI
+coefs6 <- summary(QP_GLM6)$coefficients   
+conf_intervals6 <- data.frame(
+  term = rownames(coefs6),
+  estimate = coefs6[, "Estimate"],
+  std_error = coefs6[, "Std. Error"],
+  conf_low = coefs6[, "Estimate"] - 1.96 * coefs1[, "Std. Error"],
+  conf_high = coefs6[, "Estimate"] + 1.96 * coefs1[, "Std. Error"])
+
+#GRAFICO 
+ggplot(conf_intervals6, aes(x = reorder(term, estimate), y = estimate)) +
+  geom_point(color = "darkgreen", size = 3) +
+  geom_errorbar(aes(ymin = conf_low, ymax = conf_high), width = 0.2, color = "darkgreen") +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  coord_flip() + labs( title = "Coefficienti GLM (quasi-Poisson) con intervalli di confidenza (scala log)",
+    x = "Termini del modello",
+    y = "Coefficiente stimato (scala log)" ) +  theme_minimal()
+
+#################################### TIPO MP e Genus + Dimensions + Nest #####################################
+GLM7<- glm(MPtype_COD ~ City + Site + Genus + Dimensions + Nest, data = DB_MP, family = poisson(log))
+summary(GLM7) 
+confint(GLM7)    
+
+#RISULTATI IN PERCENTUALE 
+coefs7 <- coef(GLM7) 
+exp_coefs7 <- exp(coefs7) 
+perc_change7 <- (exp_coefs7 - 1) * 100 
+results7 <- data.frame(Coefficient = names(coefs6),
+  Estimate = round(coefs7, 4),
+  Exp_Estimate = round(exp_coefs7, 4),
+  Percent_Change = round(perc_change7, 2))
+results7
+
+#GRAFICO
+GRAF_GLM7<- broom::tidy(GLM7, conf.int = TRUE)
+#GRAF_GLM7 <- tidy_glm[GRAF_GLM7$term != "(Intercept)", ] #Rimuovi intercetta se vuoi
+
+ggplot(GRAF_GLM7, aes(x = reorder(term, estimate), y = estimate)) +
+  geom_point(color = "blue", size = 3) + geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.2, color = "blue") +
+  geom_hline(yintercept = 0, linetype = "dashed") + coord_flip() + labs(title = "Coefficienti GLM con intervalli di confidenza (scala log)",
+    x = "Termini del modello", y = "Coefficiente stimato (log scale)") + theme_minimal()
+
+#OVERDISPERSIONE 
+dispersion_ratio7 <- deviance(GLM7) / df.residual(GLM7) 
+dispersion_ratio7 # [1] 0.4404135 = sotto dispersione, VAR<ATTESA
+
+#################################### TOT MP e Genus + Dimensions + SCOPA  #####################################
+GLM8<- glm(Tot_MP ~ City + Site + Genus + Dimensions + Scopa, data = DB_MP, family = poisson(log))
+summary(GLM8) 
+confint(GLM8)    
+
+#RISULTATI IN PERCENTUALE 
+coefs8 <- coef(GLM8) 
+exp_coefs8 <- exp(coefs8) 
+perc_change8 <- (exp_coefs8 - 1) * 100 
+results8 <- data.frame(Coefficient = names(coefs8),
+  Estimate = round(coefs8, 4),
+  Exp_Estimate = round(exp_coefs8, 4),
+  Percent_Change = round(perc_change8, 2))
+results8
+
+#GRAFICO
+GRAF_GLM8<- broom::tidy(GLM8, conf.int = TRUE)
+#GRAF_GLM8 <- tidy_glm[GRAF_GLM8$term != "(Intercept)", ] #Rimuovi intercetta se vuoi
+
+ggplot(GRAF_GLM8, aes(x = reorder(term, estimate), y = estimate)) +
+  geom_point(color = "blue", size = 3) + geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.2, color = "blue") +
+  geom_hline(yintercept = 0, linetype = "dashed") + coord_flip() + labs(title = "Coefficienti GLM con intervalli di confidenza (scala log)",
+    x = "Termini del modello", y = "Coefficiente stimato (log scale)") + theme_minimal()
+
+#OVERDISPERSIONE 
+dispersion_ratio8 <- deviance(GLM8) / df.residual(GLM8) 
+dispersion_ratio8 # [1] 1.497356 = sovra dispersione, VAR>ATTESA
+
+#MODELLO QUASI-POISSON 
+QP_GLM8 <- glm(Tot_MP ~ City + Site + Genus + Dimensions + Scopa, data = DB_MP, family = quasipoisson(link = "log"))
+summary(QP_GLM8) 
+
+#INTERVALLI DI CONFIDENZA APPROSSIMATI
+coefs8 <- summary(QP_GLM8)$coefficients   
+conf_intervals8 <- data.frame(
+  term = rownames(coefs8),
+  estimate = coefs8[, "Estimate"],
+  std_error = coefs8[, "Std. Error"],
+  conf_low = coefs8[, "Estimate"] - 1.96 * coefs1[, "Std. Error"],
+  conf_high = coefs8[, "Estimate"] + 1.96 * coefs1[, "Std. Error"])
+
+#GRAFICO 
+ggplot(conf_intervals8, aes(x = reorder(term, estimate), y = estimate)) +
+  geom_point(color = "darkgreen", size = 3) +
+  geom_errorbar(aes(ymin = conf_low, ymax = conf_high), width = 0.2, color = "darkgreen") +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  coord_flip() + labs( title = "Coefficienti GLM (quasi-Poisson) con intervalli di confidenza (scala log)",
+    x = "Termini del modello",
+    y = "Coefficiente stimato (scala log)" ) +  theme_minimal()
+
+#################################### TIPO MP e Genus + Dimensions + SCOPA  #####################################
+GLM9<- glm(MPtype_CPD ~ City + Site + Genus + Dimensions + Scopa, data = DB_MP, family = poisson(log))
+summary(GLM9) 
+confint(GLM9)    
+
+#RISULTATI IN PERCENTUALE 
+coefs9 <- coef(GLM9) 
+exp_coefs9 <- exp(coefs9) 
+perc_change9 <- (exp_coefs9 - 1) * 100 
+results9 <- data.frame(Coefficient = names(coefs9),
+  Estimate = round(coefs9, 4),
+  Exp_Estimate = round(exp_coef8, 4),
+  Percent_Change = round(perc_change8, 2))
+results8
+
+#GRAFICO
+GRAF_GLM8<- broom::tidy(GLM8, conf.int = TRUE)
+#GRAF_GLM8 <- tidy_glm[GRAF_GLM8$term != "(Intercept)", ] #Rimuovi intercetta se vuoi
+
+ggplot(GRAF_GLM8, aes(x = reorder(term, estimate), y = estimate)) +
+  geom_point(color = "blue", size = 3) + geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.2, color = "blue") +
+  geom_hline(yintercept = 0, linetype = "dashed") + coord_flip() + labs(title = "Coefficienti GLM con intervalli di confidenza (scala log)",
+    x = "Termini del modello", y = "Coefficiente stimato (log scale)") + theme_minimal()
+
+#OVERDISPERSIONE 
+dispersion_ratio8 <- deviance(GLM8) / df.residual(GLM8) 
+dispersion_ratio8 # [1] 1.497356 = sovra dispersione, VAR>ATTESA
+
+#MODELLO QUASI-POISSON 
+QP_GLM8 <- glm(Tot_MP ~ City + Site + Genus + Dimensions + Scopa, data = DB_MP, family = quasipoisson(link = "log"))
+summary(QP_GLM8) 
+
+#INTERVALLI DI CONFIDENZA APPROSSIMATI
+coefs8 <- summary(QP_GLM8)$coefficients   
+conf_intervals8 <- data.frame(
+  term = rownames(coefs8),
+  estimate = coefs8[, "Estimate"],
+  std_error = coefs8[, "Std. Error"],
+  conf_low = coefs8[, "Estimate"] - 1.96 * coefs1[, "Std. Error"],
+  conf_high = coefs8[, "Estimate"] + 1.96 * coefs1[, "Std. Error"])
+
+#GRAFICO 
+ggplot(conf_intervals8, aes(x = reorder(term, estimate), y = estimate)) +
+  geom_point(color = "darkgreen", size = 3) +
+  geom_errorbar(aes(ymin = conf_low, ymax = conf_high), width = 0.2, color = "darkgreen") +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  coord_flip() + labs( title = "Coefficienti GLM (quasi-Poisson) con intervalli di confidenza (scala log)",
+    x = "Termini del modello",
+    y = "Coefficiente stimato (scala log)" ) +  theme_minimal()
+
+
