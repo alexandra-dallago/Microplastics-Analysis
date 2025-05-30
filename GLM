@@ -58,6 +58,9 @@ conf_intervals1 <- data.frame(
   conf_low = coefs1[, "Estimate"] - 1.96 * coefs1[, "Std. Error"],
   conf_high = coefs1[, "Estimate"] + 1.96 * coefs1[, "Std. Error"] )
 
+dispersion_ratio_QP <- deviance(QP_GLM1) / df.residual(QP_GLM1) # Deviance residual / df residui
+dispersion_ratio_QP # [1] 2.400459
+
 #GRAFICO 
 ggplot(conf_intervals1, aes(x = reorder(term, estimate), y = estimate)) +
   geom_point(color = "darkgreen", size = 3) +
@@ -70,6 +73,10 @@ ggplot(conf_intervals1, aes(x = reorder(term, estimate), y = estimate)) +
 ##### NON BINOMIAL ##### altro metodo per correggere l'overdispersione
 GLM1_nb <- glm.nb(Tot_MP ~ City + Site, data = DB_MP)
 summary(GLM1_nb)
+
+dispersion_ratio_nb <- deviance(GLM1_nb) / df.residual(GLM1_nb) # Deviance residual / df residui
+dispersion_ratio_nb # [1] 0.9951807
+
 
 #INTERVALLI DI CONFIDENZA APPROSSIMATI  DA FAREEEEEEEEEEEEEEEEEEEEEEE
 coefs1 <- summary(QP_GLM1)$coefficients   
