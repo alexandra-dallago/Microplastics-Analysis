@@ -14,7 +14,7 @@ summary(GLM1) #per vedere se i coeff sono significativi
 
 confint(GLM1)    # Intervalli di confidenza
 
-#RISULTATI IN PERCENTUALE 
+#### RISULTATI IN PERCENTUALE 
 coefs1 <- coef(GLM1) 
 exp_coefs1 <- exp(coefs1) 
 perc_change1 <- (exp_coefs1 - 1) * 100 
@@ -25,11 +25,11 @@ results1 <- data.frame(
   Percent_Change = round(perc_change1, 2))
 results1
 
-#GRAFICO 1 
-GRAF_GLM1<- broom::tidy(GLM1, conf.int = TRUE) #estrarre i coeff + intervalli (conf.level=0.95 di default)
-#GRAF_GLM1 <- tidy_glm[GRAF_GLM1$term != "(Intercept)", ] # Rimuovi intercetta se vuoi
+#### GRAFICO FOREST PLOT 
+FOREST_PLOT_1<- broom::tidy(GLM1, conf.int = TRUE) #estrarre i coeff + intervalli (conf.level=0.95 di default)
+#FOREST_PLOT_1 <- tidy_glm[FOREST_PLOT_1$term != "(Intercept)", ] # Rimuovi intercetta se vuoi
 
-ggplot(GRAF_GLM1, aes(x = reorder(term, estimate), y = estimate)) +
+ggplot(FOREST_PLOT_1, aes(x = reorder(term, estimate), y = estimate)) +
   geom_point(color = "blue", size = 3) +
   geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.2, color = "blue") +
   geom_hline(yintercept = 0, linetype = "dashed") +
@@ -37,60 +37,97 @@ ggplot(GRAF_GLM1, aes(x = reorder(term, estimate), y = estimate)) +
     x = "Termini del modello",
     y = "Coefficiente stimato (log scale)" ) + theme_minimal()
 
-#GRAFICO 2
-pred_interaction <- ggpredict(GLM1, terms = c("City", "Site"))
-plot(pred_interaction) + labs(title = "Predizioni GLM1 per interazione City:Site")
+#### GRAFICO PREVISIONI MARGINALI
+PREV_MARG_1<- ggpredict(GLM1, terms = c("City", "Site"))
+plot(PREV_MARG_1) + labs(title = "Predizioni GLM1 per interazione City:Site")
 
-#OVERDISPERSIONE 
+#### OVERDISPERSIONE 
 dispersion_ratio1 <- deviance(GLM1) / df.residual(GLM1) # Deviance residual / df residui
 dispersion_ratio1 # [1] 2.400459
 
-##### MODELLO QUASI-POISSON ##### per correggere la varianza 
+#### MODELLO QUASI-POISSON ##### per correggere la varianza 
 QP_GLM1 <- glm(Tot_MP ~ City + Site, data = DB_MP, family = quasipoisson(link = "log"))
 summary(QP_GLM1) #dispersione di 2.78 --> vicino a 1 --> ok quasi-poisson
 
 #INTERVALLI DI CONFIDENZA APPROSSIMATI
-coefs1 <- summary(QP_GLM1)$coefficients   
-conf_intervals1 <- data.frame(
-  term = rownames(coefs1),
-  estimate = coefs1[, "Estimate"],
-  std_error = coefs1[, "Std. Error"],
-  conf_low = coefs1[, "Estimate"] - 1.96 * coefs1[, "Std. Error"],
-  conf_high = coefs1[, "Estimate"] + 1.96 * coefs1[, "Std. Error"] )
+coefs_QP_1 <- summary(QP_GLM1)$coefficients   
+conf_intervals_QP_1 <- data.frame(
+  term = rownames(coefs_QP_1),
+  estimate = coefs_QP_1[, "Estimate"],
+  std_error = coefs_QP_1[, "Std. Error"],
+  conf_low = coefs_QP_1[, "Estimate"] - 1.96 * coefs1[, "Std. Error"],
+  conf_high = coefs_QP_1[, "Estimate"] + 1.96 * coefs1[, "Std. Error"] )
 
-dispersion_ratio_QP <- deviance(QP_GLM1) / df.residual(QP_GLM1) # Deviance residual / df residui
-dispersion_ratio_QP # [1] 2.400459
+dispersion_ratio_QP_1 <- deviance(QP_GLM1) / df.residual(QP_GLM1) # Deviance residual / df residui
+dispersion_ratio_QP_1 # [1] 2.400459
 
-#GRAFICO 
-ggplot(conf_intervals1, aes(x = reorder(term, estimate), y = estimate)) +
+##### GRAFICO FOREST PLOT
+FOREST_PLOT_QP_1<-ggplot(conf_intervals_QP_1, aes(x = reorder(term, estimate), y = estimate)) +
   geom_point(color = "darkgreen", size = 3) +
   geom_errorbar(aes(ymin = conf_low, ymax = conf_high), width = 0.2, color = "darkgreen") +
   geom_hline(yintercept = 0, linetype = "dashed") +
   coord_flip() +  labs( title = "Coefficienti GLM (quasi-Poisson) con intervalli di confidenza (scala log)",
     x = "Termini del modello",
     y = "Coefficiente stimato (scala log)" ) + theme_minimal()
+FOREST_PLOT_QP_1
+
+#### GRAFICO PREVISIONI MARGINALI
+PREV_MARG_QP_1<- ggpredict(QP_GLM1, terms = c("City", "Site"))
+plot(PREV_MARG_QP_1) + labs(title = "Predizioni GLM1 per interazione City:Site")
 
 ##### NON BINOMIAL ##### altro metodo per correggere l'overdispersione
-GLM1_nb <- glm.nb(Tot_MP ~ City + Site, data = DB_MP)
-summary(GLM1_nb)
+NB_GLM1 <- glm.nb(Tot_MP ~ City + Site, data = DB_MP)
+summary(NB_GLM1)
 
-dispersion_ratio_nb <- deviance(GLM1_nb) / df.residual(GLM1_nb) # Deviance residual / df residui
-dispersion_ratio_nb # [1] 0.9951807
-
+dispersion_ratio_NB_1 <- deviance(NB_GLM1) / df.residual(NB_GLM1) # Deviance residual / df residui
+dispersion_ratio_NB_1# [1] 0.9951807
 
 #INTERVALLI DI CONFIDENZA APPROSSIMATI  DA FAREEEEEEEEEEEEEEEEEEEEEEE
-coefs1 <- summary(QP_GLM1)$coefficients   
-conf_intervals1 <- data.frame(
-  term = rownames(coefs1),
-  estimate = coefs1[, "Estimate"],
-  std_error = coefs1[, "Std. Error"],
-  conf_low = coefs1[, "Estimate"] - 1.96 * coefs1[, "Std. Error"],
-  conf_high = coefs1[, "Estimate"] + 1.96 * coefs1[, "Std. Error"] )
+coefs_NB_1 <- summary(NB_GLM1)$coefficients   
+conf_intervals_NB_1 <- data.frame(
+  term = rownames(coefs_NB_1),
+  estimate = coefs_NB_1[, "Estimate"],
+  std_error = coefs_NB_1[, "Std. Error"],
+  conf_low = coefs_NB_1[, "Estimate"] - 1.96 * coefs1[, "Std. Error"],
+  conf_high = coefs_NB_1[, "Estimate"] + 1.96 * coefs1[, "Std. Error"] )
 
+#### GRAFICO FOREST PLOT 
+FOREST_PLOT_NB_1<- broom::tidy(NB_GLM1, conf.int = TRUE) #estrarre i coeff + intervalli (conf.level=0.95 di default)
+#FOREST_PLOT_1 <- tidy_glm[FOREST_PLOT_1$term != "(Intercept)", ] # Rimuovi intercetta se vuoi
+
+ggplot(FOREST_PLOT_NB_1, aes(x = reorder(term, estimate), y = estimate)) +
+  geom_point(color = "blue", size = 3) +
+  geom_errorbar(aes(ymin = conf.low, ymax = conf.high), width = 0.2, color = "blue") +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  coord_flip() +  labs( title = "Coefficienti GLM con intervalli di confidenza (scala log)",
+    x = "Termini del modello",
+    y = "Coefficiente stimato (log scale)" ) + theme_minimal()
+
+#### GRAFICO PREVISIONI MARGINALI
+PREV_MARG_NB_1<- ggpredict(NB_GLM1, terms = c("City", "Site"))
+plot(PREV_MARG_NB_1) + labs(title = "Predizioni GLM1 per interazione City:Site")
+
+#################cose
 #GRAFICO
-broom::tidy(GLM1_nb, conf.int = TRUE)
-pred_nb <- ggpredict(GLM1_nb, terms = c("City", "Site"))
-plot(pred_nb)
+broom::tidy(NB_GLM1, conf.int = TRUE)
+pred_NB_1 <- ggpredict(NB_GLM1, terms = c("City", "Site"))
+pred_NB_1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
