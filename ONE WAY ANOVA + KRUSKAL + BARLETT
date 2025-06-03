@@ -7,6 +7,11 @@ library(rcompanion)
 library(dplyr)
 library(patchwork)
 
+#NB:per vedere solamente i risultati significativi Con p-value aggiustato < 0.05
+#significant_results <- dunn_test$res %>%
+#filter(P.adj < 0.05)
+#print(significant_results)
+
 ############# TOT MP * SITE ############# 
 mod1 <- aov(Tot_MP ~ Site, data = DB_MP)
 summary(mod1)
@@ -15,16 +20,13 @@ shapiro.test(residui1) #W = 0.85628, p-value < 2.2e-16 ; distribuzione NON norma
 leveneTest(Tot_MP ~ Site, data = DB_MP) #p.value=0.0016173 ; varianze NON omogenea 
 
 kruskal.test(Tot_MP ~ Site, data = DB_MP) #p-value = 4.427e-10 ; ESISTONO differenze significative tra i gruppi 
-dunn_test<-dunnTest(Tot_MP ~ Site, data = DB_MP, method = "bonferroni") #p.adj>0.05 = SIGNIFICATIVO ; p.adj>0.05 NON significativo
-dunn_test
+dunn_test1<-dunnTest(Tot_MP ~ Site, data = DB_MP, method = "bonferroni") #p.adj>0.05 = SIGNIFICATIVO ; p.adj>0.05 NON significativo
+dunn_test1
 
-#	Bam - CREAA	3.5e-07
-#	CREAA - Dumbo	0.0219
-#	Bam - Giardini Margherita	0.000137
-#	Bam - Parco Nord	1.04e-07
-# Dumbo - Parco Nord	0.0439
-#	Bam - Velodromo	2e-07
-#	Dumbo - Velodromo
+#per vedere solamente i risultati significativi Con p-value aggiustato < 0.05
+significant_results1<- dunn_test1$res %>%
+filter(P.adj < 0.05)
+print(significant_results1)
 
 #Grafico 
 TOTMP_SITE<- cldList(comparison = dunn_test$res$Comparison,
@@ -46,16 +48,21 @@ ggplot(DB_MP, aes(x = Site, y = Tot_MP)) +
 mod2 <- aov(Tot_MP ~ Genus, data = DB_MP)
 summary(mod2)
 residui2 <- residuals(mod2)
-shapiro.test(residui2) # W = 0.90375, p-value < 2.2e-16; distribuzione NON normale
-leveneTest(Tot_MP ~ Genus, data = DB_MP) # p-value = 5.875e-05 ; varianze NON omogenee 
+shapiro.test(residui2) # W = 0.90752, p-value < 2.2e-16; distribuzione NON normale
+leveneTest(Tot_MP ~ Genus, data = DB_MP) # p-value = 1.071e-05 ; varianze NON omogenee 
 
 kruskal.test(Tot_MP ~ Genus, data = DB_MP) # p-value < 2.2e-16; ESISTONO differenze significative tra i gruppi 
-dunn_test <- dunnTest(Tot_MP ~ Genus, data = DB_MP, method = "bonferroni") # p.adj < 0.05 = SIGNIFICATIVO ; p.adj > 0.05 NON significativo
-dunn_test
+dunn_test2 <- dunnTest(Tot_MP ~ Genus, data = DB_MP, method = "bonferroni") # p.adj < 0.05 = SIGNIFICATIVO ; p.adj > 0.05 NON significativo
+dunn_test2
+
+#per vedere solamente i risultati significativi Con p-value aggiustato < 0.05
+significant_results2<- dunn_test2$res %>%
+filter(P.adj < 0.05)
+print(significant_results2)
 
 # Grafico 
-TOTMP_GENUS<- cldList(comparison = dunn_test$res$Comparison,
-               p.value = dunn_test$res$P.adj,
+TOTMP_GENUS<- cldList(comparison = dunn_test2$res$Comparison,
+               p.value = dunn_test2$res$P.adj,
                threshold = 0.05)
 ggplot(DB_MP, aes(x = Genus, y = Tot_MP)) +
   geom_boxplot(fill = "skyblue") +
@@ -73,15 +80,15 @@ mod3 <- aov(Tot_MP ~ Sex, data = DB_MP)
 residui3<- residuals(mod3)
 shapiro.test(residui3)      #W = 0.83378, p-value < 2.2e-16
 summary(mod3)
-leveneTest(Tot_MP ~ Sex, data = DB_MP) #p-value = 0.9529 ; AVVETTI HO= LE MEDIE SONO UGUALI
+leveneTest(Tot_MP ~ Sex, data = DB_MP) #p-value = 0.9529 ; NON ci sono differenze
 
 kruskal.test(Tot_MP ~ Sex, data = DB_MP) # p-value = 0.02139; ESISTONO differenze significative tra i gruppi 
-dunn_test <- dunnTest(Tot_MP ~ Sex, data = DB_MP, method = "bonferroni") # p.adj =0.02139387 = SIGNIFICATIVO 
-dunn_test
+dunn_test3 <- dunnTest(Tot_MP ~ Sex, data = DB_MP, method = "bonferroni") # p.adj =0.02139387 = SIGNIFICATIVO 
+dunn_test3
 
 #Grafico
-TOTMP_SEX <- cldList(comparison = dunn_test$res$Comparison,
-               p.value = dunn_test$res$P.adj,
+TOTMP_SEX <- cldList(comparison = dunn_test3$res$Comparison,
+               p.value = dunn_test3$res$P.adj,
                threshold = 0.05)
 ggplot(DB_MP, aes(x = Sex, y = Tot_MP)) +
   geom_boxplot(fill = "skyblue") +
@@ -102,16 +109,17 @@ summary(mod4)
 
 leveneTest(Tot_MP ~ Dimensions, data = DB_MP) #p-value= 4.877e-12 VARIANZE DIVERSE
 kruskal.test(Tot_MP ~ Dimensions, data = DB_MP) #p-value < 2.2e-16; ESISTONO differenze significative tra i gruppi 
-dunn_test <- dunnTest(Tot_MP ~ Dimensions, data = DB_MP, method = "bonferroni") # p.adj =0.02139387 = SIGNIFICATIVO 
-dunn_test
+dunn_test4 <- dunnTest(Tot_MP ~ Dimensions, data = DB_MP, method = "bonferroni") # p.adj =0.02139387 = SIGNIFICATIVO 
+dunn_test4
 
-#Confronto B - M: p.adj = 0.8054 → non significativo
-#Confronto B - S: p.adj ≈ 6e-19 → altamente significativo
-#Confronto M - S: p.adj ≈ 4.6e-24 → altamente significativo
+#per vedere solamente i risultati significativi Con p-value aggiustato < 0.05
+significant_results4<- dunn_test4$res %>%
+filter(P.adj < 0.05)
+print(significant_results4)
 
 #Grafico
-TOTMP_DIMENSIONS <- cldList(comparison = dunn_test$res$Comparison,
-               p.value = dunn_test$res$P.adj,
+TOTMP_DIMENSIONS <- cldList(comparison = dunn_test4$res$Comparison,
+               p.value = dunn_test4$res$P.adj,
                threshold = 0.05)
 ggplot(DB_MP, aes(x = Dimensions, y = Tot_MP)) +
   geom_boxplot(fill = "skyblue") +
@@ -144,19 +152,17 @@ shapiro.test(residui5)  #W = 0.89537, p-value = 3.689e-16 ; NON seguono una dist
 leveneTest(Tot_MP ~ Scopa, data = DB_MP_noNA )  #p-value 0.005896; VARIANZE DIVERSE 
 
 kruskal.test(Tot_MP ~ Scopa, data = DB_MP_noNA ) #p-value 1.968e-15 ; ESISTONO differenze significative tra i gruppi 
-dunn_test <- dunnTest(Tot_MP ~ Scopa, data = DB_MP_noNA , method = "bonferroni") 
-dunn_test
+dunn_test5 <- dunnTest(Tot_MP ~ Scopa, data = DB_MP_noNA , method = "bonferroni") 
+dunn_test5
 
-#C - I  2.720813 6.512164e-03 3.907299e-02
-#C - V -1.592618 1.112458e-01 6.674751e-01
-#I - V -3.108422 1.880896e-03 1.128537e-02
-#C - Z  5.139120 2.760283e-07 1.656170e-06
-#I - Z -1.754372 7.936672e-02 4.762003e-01
-#V - Z  7.238980 4.520708e-13 2.712425e-12
+#per vedere solamente i risultati significativi Con p-value aggiustato < 0.05
+significant_results5<- dunn_test5$res %>%
+filter(P.adj < 0.05)
+print(significant_results5)
 
 #Grafico
-TOTMP_SCOPA <- cldList(comparison = dunn_test$res$Comparison,
-               p.value = dunn_test$res$P.adj,
+TOTMP_SCOPA <- cldList(comparison = dunn_test5$res$Comparison,
+               p.value = dunn_test5$res$P.adj,
                threshold = 0.05)
 ggplot(DB_MP_noNA, aes(x = Scopa, y = Tot_MP)) +
   geom_boxplot(fill = "skyblue") +
@@ -182,7 +188,6 @@ DB_MP_noNA <- DB_MP_noNA[DB_MP_noNA$Nest != "NA", ]
 DB_MP_noNA$Nest <- factor(DB_MP_noNA$Nest)
 DB_MP_noNA$Nest <- droplevels(DB_MP_noNA$Nest)
 
-
 mod6 <- aov(Tot_MP ~ Nest, data = DB_MP_noNA )
 residui6<- residuals(mod6)
 shapiro.test(residui6)      # W = 0.87138, p-value < 2.2e-16
@@ -190,12 +195,17 @@ summary(mod6)
 leveneTest(Tot_MP ~ Nest, data = DB_MP_noNA )  #p-value 0.7424; ACCETTI H0
 
 kruskal.test(Tot_MP ~ Nest, data = DB_MP_noNA ) #p-value < 1.243e-08 ; ESISTONO differenze significative tra i gruppi 
-dunn_test <- dunnTest(Tot_MP ~ Nest, data = DB_MP_noNA, method = "bonferroni") # p.adj =0.02139387 = SIGNIFICATIVO 
-dunn_test
+dunn_test6<- dunnTest(Tot_MP ~ Nest, data = DB_MP_noNA, method = "bonferroni") # p.adj =0.02139387 = SIGNIFICATIVO 
+dunn_test6
+
+#per vedere solamente i risultati significativi Con p-value aggiustato < 0.05
+significant_results6<- dunn_test6$res %>%
+filter(P.adj < 0.05)
+print(significant_results6)
 
 #Grafico
-TOTMP_NEST <- cldList(comparison = dunn_test$res$Comparison,
-               p.value = dunn_test$res$P.adj,
+TOTMP_NEST <- cldList(comparison = dunn_test6$res$Comparison,
+               p.value = dunn_test6$res$P.adj,
                threshold = 0.05)
 ggplot(DB_MP_noNA, aes(x = Nest, y = Tot_MP)) +
   geom_boxplot(fill = "skyblue") +
@@ -216,50 +226,58 @@ shapiro.test(residui7) #W = 0.92781, p-value = 3.487e-13; distribuzione NON norm
 leveneTest(MPtype_COD ~ Site, data = DB_MP) #p.value=0.4449 ; varianze omogenea 
 
 kruskal.test(MPtype_COD ~ Site, data = DB_MP) #p-value = 0.01432 ; NON ESISTONO differenze 
-dunn_test <- dunnTest(MPtype_COD ~ Site, data = DB_MP, method = "bonferroni")
-dunn_test
+dunn_test7 <- dunnTest(MPtype_COD ~ Site, data = DB_MP, method = "bonferroni")
+dunn_test7
 
-# solo una comparazione è significativa: Bam vs Velodromo
+#per vedere solamente i risultati significativi Con p-value aggiustato < 0.05
+significant_results7<- dunn_test7$res %>%
+filter(P.adj < 0.05)
+print(significant_results7)
 
 #Grafico 
-cld1 <- cldList(P.adj ~ gsub(" ", "", Comparison), data = dunn, threshold = 0.05)
-cld$Group <- recode(cld$Group,
-  "Bam" = "Bam", "CREAA" = "CREAA", "Dumbo" = "Dumbo",
-  "GiardiniMargherita" = "Giardini Margherita",
-  "ParcoNord" = "Parco Nord", "Velodromo" = "Velodromo")
-ggplot(DB_MP, aes(x = Site, y = MPtype_COD)) +
-  geom_boxplot(aes(fill = Site)) +
-  geom_text(data = cld, aes(x = Group, y = max(DB_MP$MPtype_COD) + 0.1, label = Letter), vjust = 0) +
-  labs(title = "MPtype_COD per sito", x = "Sito", y = "MPtype_COD") +
-  theme_minimal() + theme(legend.position = "none")
+dunn_res7 <- dunn_test7$res
+comparisons <- strsplit(dunn_res7$Comparison, " - ")
+all_sites <- unique(unlist(comparisons))
+p_matrix <- matrix(1, nrow = length(all_sites), ncol = length(all_sites), dimnames = list(all_sites, all_sites))
+for (i in 1:nrow(dunn_res7)) {
+  pair <- unlist(strsplit(dunn_res7$Comparison[i], " - "))
+  p_matrix[pair[1], pair[2]] <- dunn_res7$P.adj[i]
+  p_matrix[pair[2], pair[1]] <- dunn_res7$P.adj[i]}
+letters7 <- multcompLetters(p_matrix, threshold = 0.05)$Letters
+label_df7 <- data.frame(Site = names(letters7), Letters = letters7, stringsAsFactors = FALSE)
+medians7 <- aggregate(MPtype_COD ~ Site, data = DB_MP, median)
+colnames(medians7) <- c("Site", "Median")
+label_df7 <- merge(label_df7, medians7, by = "Site")
+ggplot(DB_MP, aes(x = Site, y = MPtype_COD, fill = Site)) +
+geom_boxplot() + geom_text(data = label_df7, aes(x = Site, y = Median + 0.1, label = Letters),
+inherit.aes = FALSE) +  labs(title = "Confronto di MPtype_COD tra i diversi siti",  x = "Sito", y = "MPtype_COD") + theme_minimal() + theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "none")
 
 ############# MPTYPE * GENUS ############# 
 mod8<- aov(MPtype_COD ~ Genus, data = DB_MP)
 summary(mod8)
 residui8 <- residuals(mod8)
-shapiro.test(residui8) #W = 0.95442, p-value = 5.836e-10 distribuzione NON normale
-leveneTest(MPtype_COD ~ Genus, data = DB_MP) #p.value=0.02862 ; varianze NON omogenee 
+shapiro.test(residui8) #W = 0.95975, p-value = 6.412e-12; distribuzione NON normale
+leveneTest(MPtype_COD ~ Genus, data = DB_MP) #p.value=0.01025 ; varianze NON omogenee 
 
-kruskal.test(MPtype_COD ~ Genus, data = DB_MP) #p-value = 3.287e-07 ; ESISTONO differenze 
-dunn_test <- dunnTest(MPtype_COD ~ Genus, data = DB_MP, method = "bonferroni")
-dunn_test
+kruskal.test(MPtype_COD ~ Genus, data = DB_MP) #p-value = 1.277e-13; ESISTONO differenze 
+dunn_test8 <- dunnTest(MPtype_COD ~ Genus, data = DB_MP, method = "bonferroni")
+dunn_test8
+
+#per vedere solamente i risultati significativi Con p-value aggiustato < 0.05
+significant_results8<- dunn_test8$res %>%
+filter(P.adj < 0.05)
+print(significant_results8)
 
 #Grafico 
 GENUS_GROUPS <- cldList(
-  comparison = dunn_test$res$Comparison,
-  p.value = dunn_test$res$P.adj,
+  comparison = dunn_test8$res$Comparison,
+  p.value = dunn_test8$res$P.adj,
   threshold = 0.05)
 ggplot(DB_MP, aes(x = Genus, y = MPtype_COD)) +
   geom_boxplot(fill = "skyblue") +
   geom_text(data = GENUS_GROUPS,
-            aes(x = Group,
-                y = max(DB_MP$MPtype_COD, na.rm = TRUE) * 1.05,
-                label = Letter),
-            inherit.aes = FALSE,
-            size = 4) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  ggtitle("MPtype_COD per Genere")
+  aes(x = Group, y = max(DB_MP$MPtype_COD, na.rm = TRUE) * 1.05, label = Letter), inherit.aes = FALSE,
+  size = 4) + theme_minimal() + theme(axis.text.x = element_text(angle = 45, hjust = 1)) + ggtitle("MPtype_COD per Genere")
 
 ############# MPTYPE * SESSO ############# 
 mod9<- aov(MPtype_COD ~ Sex, data = DB_MP)
@@ -270,7 +288,7 @@ leveneTest(MPtype_COD ~ Sex, data = DB_MP) #pvalue=0.1375 ; varianze NON omogene
 
 kruskal.test(MPtype_COD ~ Sex, data = DB_MP) # p-value = 0.7481 ; NON ESISTONO differenze 
 
-library(ggplot2)
+
 ggplot(DB_MP, aes(x = Sex, y = MPtype_COD, fill = Sex)) +
   geom_boxplot() +
   theme_minimal() +
@@ -286,17 +304,32 @@ leveneTest(MPtype_COD ~ Dimensions, data = DB_MP) #p.value=0.002229 ; varianze N
 
 kruskal.test(MPtype_COD ~ Dimensions, data = DB_MP) # p-value = < 2.2e-16 ;  ESISTONO differenze 
 
-dunn_test <- dunnTest(MPtype_COD ~ Dimensions, data = DB_MP, method = "bonferroni")
-dunn_test
+dunn_test10 <- dunnTest(MPtype_COD ~ Dimensions, data = DB_MP, method = "bonferroni")
+dunn_test10
 
-#B-M : non significativo ; p.value:0.188 
-#B-S : significativi ; p.value 8.4e-14
-#M-S : sigificativo ;  p.value 6.9e-13
+#per vedere solamente i risultati significativi Con p-value aggiustato < 0.05
+significant_results10<- dunn_test10$res %>%
+filter(P.adj < 0.05)
+print(significant_results10)
 
-boxplot(MPtype_COD ~ Dimensions, data = DB_MP,
-        col = c("lightblue", "lightgreen", "lightpink"),
-        main = "MPtype_COD per Dimensione",
-        xlab = "Dimensione", ylab = "MPtype_COD")
+#Grafico 
+dunn_res10 <- dunn_test10$res
+comparisons <- strsplit(dunn_res10$Comparison, " - ")
+all_groups <- unique(unlist(comparisons))
+p_matrix <- matrix(1, nrow = length(all_groups), ncol = length(all_groups), dimnames = list(all_groups, all_groups))
+for (i in 1:nrow(dunn_res10)) {
+  pair <- unlist(strsplit(dunn_res10$Comparison[i], " - "))
+  p_matrix[pair[1], pair[2]] <- dunn_res10$P.adj[i]
+  p_matrix[pair[2], pair[1]] <- dunn_res10$P.adj[i]}
+letters10 <- multcompLetters(p_matrix, threshold = 0.05)$Letters
+label_df10 <- data.frame(Dimensions = names(letters10),Letters = letters10,stringsAsFactors = FALSE)
+medians10 <- aggregate(MPtype_COD ~ Dimensions, data = DB_MP, median)
+colnames(medians10) <- c("Dimensions", "Median")
+label_df10 <- merge(label_df10, medians10, by = "Dimensions")
+ggplot(DB_MP, aes(x = Dimensions, y = MPtype_COD, fill = Dimensions)) +
+  geom_boxplot() + geom_text(data = label_df10, aes(x = Dimensions, y = Median + 0.1, label = Letters), inherit.aes = FALSE) +
+  labs(title = "MPtype_COD in base alle Dimensioni", x = "Dimensione", y = "MPtype_COD") +
+  theme_minimal() + theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "none")
 
 ############# MPTYPE * SCOPA ############# 
 #PENSO CHE ABBIA SENSO TOGLIERE GLI NA PERCHE' CE L'HANNO SOLAMENTE LE FEMMINE: 
@@ -318,24 +351,54 @@ leveneTest(MPtype_COD ~ Scopa, data = DB_MP_noNA) #p.value= 0.0001421 ; varianze
 
 kruskal.test(MPtype_COD ~ Scopa, data = DB_MP_noNA) # p-value = 1.908e-05;  ESISTONO differenze 
 
-dunn_test <- dunnTest(MPtype_COD ~ Scopa, data = DB_MP_noNA, method = "bonferroni")
-dunn_test
-#C-Z significativi 
-#V-Z significativi
+dunn_test11 <- dunnTest(MPtype_COD ~ Scopa, data = DB_MP_noNA, method = "bonferroni")
+dunn_test11
+
+#per vedere solamente i risultati significativi Con p-value aggiustato < 0.05
+significant_results11<- dunn_test11$res %>%
+filter(P.adj < 0.05)
+print(significant_results11)
 
 #grafico 
-gr <- levels(factor(DB_MP$Scopa))
-p <- c("C-I"=0.1986, "C-V"=1, "I-V"=0.1646, "C-Z"=0.0046, "I-Z"=0.7977, "V-Z"=0.0009)
-m <- matrix(1, length(gr), length(gr), dimnames=list(gr, gr))
-diag(m) <- 0
-for (nm in names(p)) {
-  x <- strsplit(nm, "-")[[1]]
-  m[x[1], x[2]] <- p[nm]
-  m[x[2], x[1]] <- p[nm]}
-lt <- multcompLetters(m, threshold=0.05)$Letters
-ylim <- c(0, max(DB_MP$MPtype_COD, na.rm = TRUE)*1.2)
-boxplot(MPtype_COD ~ Scopa, data=DB_MP_noNA, col=rainbow(length(gr)), ylim=ylim)
-text(1:length(gr), tapply(DB_MP$MPtype_COD, DB_MP$Scopa, max, na.rm=TRUE)*1.1, labels=lt)
+gdunn_res11 <- dunn_test11$res
+
+# Prepara matrice dei p-value per ottenere lettere di significatività
+comparisons <- strsplit(dunn_res11$Comparison, " - ")
+all_groups <- unique(unlist(comparisons))
+
+p_matrix <- matrix(1, nrow = length(all_groups), ncol = length(all_groups),
+                   dimnames = list(all_groups, all_groups))
+
+for (i in 1:nrow(dunn_res11)) {
+  pair <- unlist(strsplit(dunn_res11$Comparison[i], " - "))
+  p_matrix[pair[1], pair[2]] <- dunn_res11$P.adj[i]
+  p_matrix[pair[2], pair[1]] <- dunn_res11$P.adj[i]
+}
+
+# Calcolo lettere di significatività
+letters11 <- multcompLetters(p_matrix, threshold = 0.05)$Letters
+label_df11 <- data.frame(
+  Scopa = names(letters11),
+  Letters = letters11,
+  stringsAsFactors = FALSE
+)
+
+# Calcolo delle mediane per posizionare le lettere
+medians11 <- aggregate(MPtype_COD ~ Scopa, data = DB_MP_noNA, median)
+colnames(medians11) <- c("Scopa", "Median")
+label_df11 <- merge(label_df11, medians11, by = "Scopa")
+
+# Grafico
+ggplot(DB_MP_noNA, aes(x = Scopa, y = MPtype_COD, fill = Scopa)) +
+  geom_boxplot() +
+  geom_text(data = label_df11, aes(x = Scopa, y = Median + 0.1, label = Letters),
+            inherit.aes = FALSE) +
+  labs(title = "MPtype_COD rispetto alla presenza della Scopa",
+       x = "Presenza della Scopa",
+       y = "MPtype_COD") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none")
 
 ############# MPTYPE * NIDO ############# 
 #PENSO CHE ABBIA SENSO TOGLIERE GLI NA PERCHE' CE L'HANNO SOLAMENTE LE FEMMINE: 
@@ -383,7 +446,6 @@ ggplot(DB_MP_noNA, aes(x = Nest, y = MPtype_COD, fill = Nest)) +
   ylim(NA, max(letters_df$y) * 1.1)
 
 ############# TOT MP ~ CITY + SITE ############# 
-
 mod13<- aov(Tot_MP ~ City + Site, data = DB_MP)
 summary(mod13)
 residui13 <- residuals(mod13)
@@ -454,13 +516,12 @@ ggplot(DB_MP, aes(x = interaction(City, Site), y = MPtype_COD)) +
     subtitle = "Lettere indicano differenze significative")
 
 ############# TOT MP ~ GENUS + SEX ############# 
-
 mod15<- aov(Tot_MP ~ Genus + Sex, data = DB_MP)
 summary(mod15)
 residui15 <- residuals(mod15)
-shapiro.test(residui15) #W = 0.90473, p-value < 2.2e-16; distribuzione NON normale
+shapiro.test(residui15) #W = 0.9075, p-value < 2.2e-16; distribuzione NON normale
 
-leveneTest(Tot_MP ~ interaction(Genus, Sex), data = DB_MP) #p.value=4.377e-05 ; varianze sono omogenee 
+leveneTest(Tot_MP ~ interaction(Genus, Sex), data = DB_MP) #p.value= 6.757e-06 ; varianze sono omogenee 
 
 kruskal.test(Tot_MP ~ interaction(Genus, Sex), data = DB_MP) #p-value < 2.2e-16 ;  ESISTONO differenze 
 
@@ -476,10 +537,10 @@ print(significant_results)
 mod16<- aov(MPtype_COD ~ Genus + Sex, data = DB_MP)
 summary(mod16)
 residui16 <- residuals(mod16)
-shapiro.test(residui16) #W = 0.95968, p-value = 6.228e-12; distribuzione NON normale
+shapiro.test(residui16) #W = 0.96208, p-value = 1.723e-11; distribuzione NON normale
 
-leveneTest(MPtype_COD ~ interaction(Genus, Sex), data = DB_MP) #p.value=0.05174 ; varianze non sono omogenee 
-kruskal.test(MPtype_COD ~ interaction(Genus, Sex), data = DB_MP) #p-value 3.419e-12 ;  ESISTONO differenze 
+leveneTest(MPtype_COD ~ interaction(Genus, Sex), data = DB_MP) #p.value= 0.01442 ; varianze non sono omogenee 
+kruskal.test(MPtype_COD ~ interaction(Genus, Sex), data = DB_MP) #p-value 6.021e-13;  ESISTONO differenze 
 
 dunn_test <- dunnTest(MPtype_COD ~ interaction(Genus, Sex), data = DB_MP, method = "bonferroni")
 dunn_test
@@ -489,39 +550,42 @@ significant_results <- dunn_test$res %>%
 filter(P.adj < 0.05)
 print(significant_results)
 
-#Grafico
-significant_results <- data.frame(
-  Comparison = c("Andrena.M - Anthidium.F", "Andrena.F - Anthidium.M", "Andrena.M - Anthidium.M",
-                 "Andrena.M - Bombus terrestris.F", "Anthidium.M - Colletes.F", "Anthidium.M - Halictus.M",
-                 "Anthidium.M - Lasioglossum.F", "Bombus terrestris.F - Lasioglossum.F",
-                 "Anthidium.M - Lasioglossum.M", "Anthidium.M - Seladonia.F"),
-  Z = c(-4.036207, -4.599082, -5.551487, -4.284128, 4.804782, 4.424628, 5.960026, 4.084655, 4.703313, 4.150303),
-  P.unadj = c(5.432233e-05, 4.243570e-06, 2.832498e-08, 1.834570e-05, 1.549199e-06,
-              9.660857e-06, 2.521984e-09, 4.414245e-05, 2.559738e-06, 3.320350e-05),
-  P.adj = c(4.025285e-02, 3.144485e-03, 2.098881e-05, 1.359416e-02, 1.147957e-03,
-            7.158695e-03, 1.868790e-06, 3.270955e-02, 1.896766e-03, 2.460379e-02)
-significant_results <- significant_results %>%
-  mutate(logP = -log10(P.adj)) %>%
-  arrange(logP)
-ggplot(significant_results, aes(x = logP, y = reorder(Comparison, logP), fill = logP)) +
-  geom_col() +
-  scale_fill_gradient(low = "lightblue", high = "darkblue") +
-  labs(
-    x = "-log10(p-value corretto)",
-    y = "Confronto",
-    title = "Risultati significativi del Dunn Test",
-    fill = "-log10(p-value)") +
+#Grafico 
+dunn_results <- dunn_test$res
+comparisons <- strsplit(dunn_results$Comparison, " - ")
+all_groups <- unique(unlist(comparisons))
+p_matrix <- matrix(1, nrow = length(all_groups), ncol = length(all_groups),
+                   dimnames = list(all_groups, all_groups))
+for (i in 1:nrow(dunn_results)) {
+  pair <- unlist(strsplit(dunn_results$Comparison[i], " - "))
+  p_matrix[pair[1], pair[2]] <- dunn_results$P.adj[i]
+  p_matrix[pair[2], pair[1]] <- dunn_results$P.adj[i]}
+letters <- multcompLetters(p_matrix, threshold = 0.05)$Letters
+label_df <- data.frame(
+  Group = names(letters),
+  Letters = letters,
+  stringsAsFactors = FALSE)
+medians <- aggregate(MPtype_COD ~ interaction(Genus, Sex), data = DB_MP, median)
+colnames(medians) <- c("Group", "Median")
+label_df <- merge(label_df, medians, by = "Group")
+ggplot(DB_MP, aes(x = interaction(Genus, Sex), y = MPtype_COD, fill = interaction(Genus, Sex))) +
+  geom_boxplot() +
+  geom_text(data = label_df, aes(x = Group, y = Median + 0.1, label = Letters), inherit.aes = FALSE) +
+  labs(title = "Boxplot di MPtype_COD per gruppo (Genus:Sex)",
+       x = "Gruppi",
+       y = "MPtype_COD") +
   theme_minimal() +
-  theme(axis.text.y = element_text(size = 9))
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none")
 
 ############# 3. DOVE SI ACCUMULA LA PLASTICA SUL CORPO (TESTA*GENERI)?  #############
 mod17<- aov(Head ~ Genus, data = DB_MP)
 residui17<- residuals(mod17)
 summary(mod17)
-shapiro.test(residui17)  # W = 0.87774, p-value = 8.177e-15
+shapiro.test(residui17)  #W = 0.88311, p-value = 1.852e-14
 
-leveneTest(Head ~ Genus, data = DB_MP) #p.value= 0.07791 ; varianze omogenee 
-kruskal.test(Head ~ Genus, data = DB_MP) #p-value = 0.006082 ; ESISTONO differenze 
+leveneTest(Head ~ Genus, data = DB_MP) #p.value= 0.01221 ; varianze omogenee 
+kruskal.test(Head ~ Genus, data = DB_MP) #p-value = 0.004341; ESISTONO differenze 
 
 dunn_test <- dunnTest(Head ~ Genus, data = DB_MP, method = "bonferroni")
 dunn_test
@@ -532,10 +596,10 @@ dunn_test
 mod18 <- aov(Legs ~ Genus, data = DB_MP)
 residui18 <- residuals(mod18)
 summary(mod18)
-shapiro.test(residui18)  # W = 0.86943, p-value < 2.2e-16; non normale 
+shapiro.test(residui18)  #W = 0.86848, p-value < 2.2e-16; non normale 
 
-leveneTest(Legs ~ Genus, data = DB_MP)  #p.value= 1.638e-05; non omogenee
-kruskal.test(Legs ~ Genus, data = DB_MP)  # p.value= 1.991e-14 ; differenze
+leveneTest(Legs ~ Genus, data = DB_MP)  #p.value= 1.297e-07; non omogenee
+kruskal.test(Legs ~ Genus, data = DB_MP)  #p.value= 2.035e-15; differenze
 
 dunn_test <- dunnTest(Legs ~ Genus, data = DB_MP, method = "bonferroni")
 dunn_test
@@ -545,25 +609,14 @@ significant_results <- dunn_test$res %>%
 filter(P.adj < 0.05)
 print(significant_results)
 
-#Andrena - Anthidium  2.852280e-06
-#Andrena - Bombus terrestris  2.392330e-02
-#Anthidium - Colletes  6.684970e-03
-#Andrena - Halictus  4.216431e-02
-#Anthidium - Hoplitis  1.892001e-02
-#Anthidium - Lasioglossum  1.988300e-12
-#Bombus pascuorum - Lasioglossum  1.582472e-03
-#Bombus terrestris - Lasioglossum  7.756727e-05
-#Halictus - Lasioglossum  5.751572e-06
-#Anthidium - Megachile  8.246435e-04
-
 ############# DOVE SI ACCUMULA LA PLASTICA SUL CORPO (TORAX*GENERI)? #############
 mod19 <- aov(Torax ~ Genus, data = DB_MP)
 residui19 <- residuals(mod18)
 summary(mod19)
-shapiro.test(residui19)  # W = 0.86943, p-value < 2.2e-16
+shapiro.test(residui19)  #W = 0.86848, p-value < 2.2e-16
 
-leveneTest(Torax ~ Genus, data = DB_MP)  #p.value=0.01018; sono omogenee
-kruskal.test(Torax ~ Genus, data = DB_MP)  #p.value=1.023e-07
+leveneTest(Torax ~ Genus, data = DB_MP)  #p.value=0.006432; sono omogenee
+kruskal.test(Torax ~ Genus, data = DB_MP)  #p.value=3.406e-07
 
 dunn_test <- dunnTest(Torax ~ Genus, data = DB_MP, method = "bonferroni")
 dunn_test
@@ -573,21 +626,14 @@ significant_results <- dunn_test$res %>%
 filter(P.adj < 0.05)
 print(significant_results)
 
-#Andrena - Bombus terrestris  5.860827e-04
-#Bombus terrestris - Halictus  2.766367e-03
-#Bombus terrestris - Lasioglossum  2.763340e-06
-#Bombus terrestris - Megachile  2.472131e-04
-#Andrena - Xylocopa violacea  4.754554e-02
-#Lasioglossum - Xylocopa violacea  2.737438e-02
-
 ############# DOVE SI ACCUMULA LA PLASTICA SUL CORPO (ADDOME*GENERI)? #############
 mod20 <- aov(Abdomen ~ Genus, data = DB_MP)
 residui20 <- residuals(mod20)
 summary(mod20)
-shapiro.test(residui20)  #W = 0.85787, p-value < 2.2e-16
+shapiro.test(residui20)  #W = 0.85607, p-value < 2.2e-16
 
-leveneTest(Abdomen ~ Genus, data = DB_MP)  #p.value=0.2403 ; omogenee
-kruskal.test(Abdomen ~ Genus, data = DB_MP)  #p.value=0.001747
+leveneTest(Abdomen ~ Genus, data = DB_MP)  #p.value=0.0094 ; omogenee
+kruskal.test(Abdomen ~ Genus, data = DB_MP)  #p.value=0.0003529
 
 dunn_test <- dunnTest(Abdomen ~ Genus, data = DB_MP, method = "bonferroni")
 dunn_test
@@ -596,16 +642,15 @@ significant_results <- dunn_test$res %>%
   filter(P.adj < 0.05)
 print(significant_results)
 
-# Anthidium - Lasioglossum  0.01505927
 
 ############# DOVE SI ACCUMULA LA PLASTICA SUL CORPO (ALI*GENERI)? #############
 mod21 <- aov(Wings ~ Genus, data = DB_MP)
 residui21 <- residuals(mod21)
 summary(mod21)
-shapiro.test(residui21)  #W = 0.69194, p-value = 7.501e-15
+shapiro.test(residui21)  #W = 0.7097, p-value = 2.108e-14
 
-leveneTest(Wings ~ Genus, data = DB_MP)  #p.value= 0.2688; Omogenee
-kruskal.test(Wings ~ Genus, data = DB_MP)  #p-value = 0.02458
+leveneTest(Wings ~ Genus, data = DB_MP)  #p.value= 0.0812; Omogenee, non ci sono varianze tra i gruppi genus 
+kruskal.test(Wings ~ Genus, data = DB_MP)  #p-value = 0.01698
 
 dunn_test <- dunnTest(Wings ~ Genus, data = DB_MP, method = "bonferroni")
 dunn_test
@@ -618,10 +663,3 @@ print(significant_results)
 #messuno risulta significativamente diverso
 
 ############# DOVE SI ACCUMULANO LE MP (LEGS*SEX)? #############
-mod9 <- aov(Legs ~ Sex, data = DB_MP)
-residui9<- residuals(mod9)
-shapiro.test(residui9)      #W = 0.75831, p-value < 2.2e-16
-summary(mod9)
-bartlett.test(Legs ~ Sex, data = DB_MP) p-value = 0.158  NON ESISTONO differenze 
-kruskal.test(Legs ~ Sex, data = DB_MP) #p-value = 0.4348; NON ESISTONO differenze significative tra i gruppi 
-
