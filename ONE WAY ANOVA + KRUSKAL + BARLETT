@@ -20,13 +20,22 @@ shapiro.test(residui1) #W = 0.85628, p-value < 2.2e-16 ; distribuzione NON norma
 leveneTest(Tot_MP ~ Site, data = DB_MP) #p.value=0.0016173 ; varianze NON omogenea 
 
 kruskal.test(Tot_MP ~ Site, data = DB_MP) #p-value = 4.427e-10 ; ESISTONO differenze significative tra i gruppi 
-dunn_test1<-dunnTest(Tot_MP ~ Site, data = DB_MP, method = "bonferroni") #p.adj>0.05 = SIGNIFICATIVO ; p.adj>0.05 NON significativo
+dunn_test1<-dunnTest(Tot_MP ~ Site, data = DB_MP, method = "bonferroni") #p.adj<0.05 = SIGNIFICATIVO ; p.adj>0.05 NON significativo
 dunn_test1
 
 #per vedere solamente i risultati significativi Con p-value aggiustato < 0.05
 significant_results1<- dunn_test1$res %>%
 filter(P.adj < 0.05)
 print(significant_results1)
+
+#                Comparison         Z      P.unadj        P.adj
+#               Bam - CREAA  5.585307 2.332874e-08 3.499312e-07
+#             CREAA - Dumbo -3.182462 1.460287e-03 2.190431e-02
+# Bam - Giardini Margherita  4.436560 9.140768e-06 1.371115e-04
+#          Bam - Parco Nord  5.792520 6.933803e-09 1.040071e-07
+#        Dumbo - Parco Nord  2.974783 2.931959e-03 4.397938e-02
+#           Bam - Velodromo  5.681681 1.333772e-08 2.000657e-07
+#         Dumbo - Velodromo  2.962319 3.053315e-03 4.579972e-02
 
 #Grafico 
 TOTMP_SITE<- cldList(comparison = dunn_test$res$Comparison,
@@ -60,6 +69,30 @@ significant_results2<- dunn_test2$res %>%
 filter(P.adj < 0.05)
 print(significant_results2)
 
+#                 Comparison         Z      P.unadj        P.adj
+#       Andrena - Anthidium -8.083442 6.296411e-16 1.454471e-13
+#          Andrena - Bombus -5.639226 1.708166e-08 3.945864e-06
+#      Anthidium - Colletes  7.136916 9.544799e-13 2.204849e-10
+#         Bombus - Colletes  5.476775 4.331468e-08 1.000569e-05
+#       Andrena - Halictus -4.478849 7.504658e-06 1.733576e-03
+#      Anthidium - Halictus  4.784145 1.717164e-06 3.966649e-04
+#       Colletes - Halictus -4.684647 2.804426e-06 6.478224e-04
+#       Colletes - Hoplitis -4.322591 1.542076e-05 3.562194e-03
+#       Anthidium - Hylaeus  4.802234 1.569055e-06 3.624518e-04
+#         Bombus - Hylaeus  3.866693 1.103210e-04 2.548415e-02
+# Anthidium - Lasioglossum 10.235324 1.377335e-24 3.181644e-22
+#    Bombus - Lasioglossum  7.470088 8.014119e-14 1.851262e-11
+#  Halictus - Lasioglossum  6.273077 3.539808e-10 8.176956e-08
+#  Hoplitis - Lasioglossum  4.184776 2.854476e-05 6.593840e-03
+#    Anthidium - Megachile  6.082456 1.183551e-09 2.734002e-07
+#    Anthidium - Seladonia  5.147302 2.642591e-07 6.104385e-05
+#       Bombus - Seladonia  3.944929 7.982354e-05 1.843924e-02
+#       Andrena - Xylocopa -4.286446 1.815540e-05 4.193896e-03
+#      Colletes - Xylocopa -4.898954 9.634807e-07 2.225640e-04
+#       Hylaeus - Xylocopa -4.557489 5.176868e-06 1.195856e-03
+#  Lasioglossum - Xylocopa -4.492456 7.040645e-06 1.626389e-03
+#     Seladonia - Xylocopa -4.460701 8.169195e-06 1.887084e-03
+
 # Grafico 
 TOTMP_GENUS<- cldList(comparison = dunn_test2$res$Comparison,
                p.value = dunn_test2$res$P.adj,
@@ -80,11 +113,14 @@ mod3 <- aov(Tot_MP ~ Sex, data = DB_MP)
 residui3<- residuals(mod3)
 shapiro.test(residui3)      #W = 0.83378, p-value < 2.2e-16
 summary(mod3)
-leveneTest(Tot_MP ~ Sex, data = DB_MP) #p-value = 0.9529 ; NON ci sono differenze
+leveneTest(Tot_MP ~ Sex, data = DB_MP) #p-value = 0.9529 ; ACCETTI HO0 (varianze uguali)
 
 kruskal.test(Tot_MP ~ Sex, data = DB_MP) # p-value = 0.02139; ESISTONO differenze significative tra i gruppi 
 dunn_test3 <- dunnTest(Tot_MP ~ Sex, data = DB_MP, method = "bonferroni") # p.adj =0.02139387 = SIGNIFICATIVO 
 dunn_test3
+
+#Comparison       Z    P.unadj      P.adj
+#1      F - M 2.30096 0.02139387 0.02139387
 
 #Grafico
 TOTMP_SEX <- cldList(comparison = dunn_test3$res$Comparison,
@@ -107,7 +143,7 @@ residui4<- residuals(mod4)
 shapiro.test(residui4)      #W = 0.87696, p-value < 2.2e-16
 summary(mod4)
 
-leveneTest(Tot_MP ~ Dimensions, data = DB_MP) #p-value= 4.877e-12 VARIANZE DIVERSE
+leveneTest(Tot_MP ~ Dimensions, data = DB_MP) #p-value= 4.877e-12 ; VARIANZE DIVERSE
 kruskal.test(Tot_MP ~ Dimensions, data = DB_MP) #p-value < 2.2e-16; ESISTONO differenze significative tra i gruppi 
 dunn_test4 <- dunnTest(Tot_MP ~ Dimensions, data = DB_MP, method = "bonferroni") # p.adj =0.02139387 = SIGNIFICATIVO 
 dunn_test4
@@ -116,6 +152,10 @@ dunn_test4
 significant_results4<- dunn_test4$res %>%
 filter(P.adj < 0.05)
 print(significant_results4)
+
+#Comparison         Z      P.unadj        P.adj
+#1      B - S  9.013679 1.992570e-19 5.977711e-19
+#2      M - S 10.224536 1.539638e-24 4.618914e-24
 
 #Grafico
 TOTMP_DIMENSIONS <- cldList(comparison = dunn_test4$res$Comparison,
@@ -160,6 +200,12 @@ significant_results5<- dunn_test5$res %>%
 filter(P.adj < 0.05)
 print(significant_results5)
 
+# Comparison         Z      P.unadj        P.adj
+#      C - I  2.720813 6.512164e-03 3.907299e-02
+#      I - V -3.108422 1.880896e-03 1.128537e-02
+#      C - Z  5.139120 2.760283e-07 1.656170e-06
+#      V - Z  7.238980 4.520708e-13 2.712425e-12
+
 #Grafico
 TOTMP_SCOPA <- cldList(comparison = dunn_test5$res$Comparison,
                p.value = dunn_test5$res$P.adj,
@@ -190,9 +236,9 @@ DB_MP_noNA$Nest <- droplevels(DB_MP_noNA$Nest)
 
 mod6 <- aov(Tot_MP ~ Nest, data = DB_MP_noNA )
 residui6<- residuals(mod6)
-shapiro.test(residui6)      # W = 0.87138, p-value < 2.2e-16
+shapiro.test(residui6)      # W = 0.87138, p-value < 2.2e-16 ; Distribuzione NON normale
 summary(mod6)
-leveneTest(Tot_MP ~ Nest, data = DB_MP_noNA )  #p-value 0.7424; ACCETTI H0
+leveneTest(Tot_MP ~ Nest, data = DB_MP_noNA )  #p-value 0.7424; ACCETTI H0, varianze uguali
 
 kruskal.test(Tot_MP ~ Nest, data = DB_MP_noNA ) #p-value < 1.243e-08 ; ESISTONO differenze significative tra i gruppi 
 dunn_test6<- dunnTest(Tot_MP ~ Nest, data = DB_MP_noNA, method = "bonferroni") # p.adj =0.02139387 = SIGNIFICATIVO 
@@ -202,6 +248,9 @@ dunn_test6
 significant_results6<- dunn_test6$res %>%
 filter(P.adj < 0.05)
 print(significant_results6)
+
+#  Comparison        Z      P.unadj        P.adj
+#         C - G 5.935319 2.932739e-09 8.798216e-09
 
 #Grafico
 TOTMP_NEST <- cldList(comparison = dunn_test6$res$Comparison,
@@ -223,9 +272,9 @@ mod7 <- aov(MPtype_COD ~ Site, data = DB_MP)
 summary(mod7)
 residui7 <- residuals(mod7)
 shapiro.test(residui7) #W = 0.92781, p-value = 3.487e-13; distribuzione NON normale
-leveneTest(MPtype_COD ~ Site, data = DB_MP) #p.value=0.4449 ; varianze omogenea 
+leveneTest(MPtype_COD ~ Site, data = DB_MP) #p.value=0.4449 ; varianze omogenee (rifiuti HO)
 
-kruskal.test(MPtype_COD ~ Site, data = DB_MP) #p-value = 0.01432 ; NON ESISTONO differenze 
+kruskal.test(MPtype_COD ~ Site, data = DB_MP) #p-value = 0.01432 ; ESISTONO differenze 
 dunn_test7 <- dunnTest(MPtype_COD ~ Site, data = DB_MP, method = "bonferroni")
 dunn_test7
 
@@ -233,6 +282,11 @@ dunn_test7
 significant_results7<- dunn_test7$res %>%
 filter(P.adj < 0.05)
 print(significant_results7)
+
+#      Comparison        Z      P.unadj        P.adj
+#      Bam - CREAA 4.186452 2.833484e-05 0.0004250226
+# Bam - Parco Nord 3.975621 7.019597e-05 0.0010529395
+#  Bam - Velodromo 4.322204 1.544784e-05 0.0002317176
 
 #Grafico 
 dunn_res7 <- dunn_test7$res
@@ -268,6 +322,21 @@ significant_results8<- dunn_test8$res %>%
 filter(P.adj < 0.05)
 print(significant_results8)
 
+#                Comparison         Z      P.unadj        P.adj
+#       Andrena - Anthidium -6.028249 1.657453e-09 3.828715e-07
+#          Andrena - Bombus -3.837731 1.241763e-04 2.868473e-02
+#      Anthidium - Colletes  4.844678 1.268173e-06 2.929479e-04
+#  Anthidium - Lasioglossum  6.642563 3.082751e-11 7.121154e-09
+#     Bombus - Lasioglossum  4.044245 5.249192e-05 1.212563e-02
+#     Anthidium - Megachile  4.031749 5.536325e-05 1.278891e-02
+#     Anthidium - Seladonia  4.275498 1.907106e-05 4.405416e-03
+#       Amegilla - Xylocopa -3.747077 1.789069e-04 4.132749e-02
+#        Andrena - Xylocopa -4.084135 4.424131e-05 1.021974e-02
+#      Colletes - Xylocopa -4.236955 2.265710e-05 5.233791e-03
+#       Hylaeus - Xylocopa -4.083529 4.435686e-05 1.024643e-02
+#  Lasioglossum - Xylocopa -3.964428 7.357200e-05 1.699513e-02
+#     Seladonia - Xylocopa -4.336483 1.447807e-05 3.344434e-03
+
 #Grafico 
 GENUS_GROUPS <- cldList(
   comparison = dunn_test8$res$Comparison,
@@ -284,11 +353,11 @@ mod9<- aov(MPtype_COD ~ Sex, data = DB_MP)
 summary(mod9)
 residui9 <- residuals(mod9)
 shapiro.test(residui9) #W = 0.85691, p-value < 2.2e-16 distribuzione NON normale
-leveneTest(MPtype_COD ~ Sex, data = DB_MP) #pvalue=0.1375 ; varianze NON omogenee 
+leveneTest(MPtype_COD ~ Sex, data = DB_MP) #pvalue=0.1375 ; varianze omogenee 
 
 kruskal.test(MPtype_COD ~ Sex, data = DB_MP) # p-value = 0.7481 ; NON ESISTONO differenze 
 
-
+#Grafico
 ggplot(DB_MP, aes(x = Sex, y = MPtype_COD, fill = Sex)) +
   geom_boxplot() +
   theme_minimal() +
@@ -302,7 +371,7 @@ residui10 <- residuals(mod10)
 shapiro.test(residui10) #W = 0.92773, p-value < 2.2e-16 distribuzione NON normale
 leveneTest(MPtype_COD ~ Dimensions, data = DB_MP) #p.value=0.002229 ; varianze NON omogenee 
 
-kruskal.test(MPtype_COD ~ Dimensions, data = DB_MP) # p-value = < 2.2e-16 ;  ESISTONO differenze 
+kruskal.test(MPtype_COD ~ Dimensions, data = DB_MP) # p-value = < 2.2e-16 ;  ESISTONO differenze tra gruppi
 
 dunn_test10 <- dunnTest(MPtype_COD ~ Dimensions, data = DB_MP, method = "bonferroni")
 dunn_test10
@@ -311,6 +380,10 @@ dunn_test10
 significant_results10<- dunn_test10$res %>%
 filter(P.adj < 0.05)
 print(significant_results10)
+
+#  Comparison        Z      P.unadj        P.adj
+#1      B - S 7.607384 2.796984e-14 8.390952e-14
+#2      M - S 7.329278 2.313954e-13 6.941862e-13
 
 #Grafico 
 dunn_res10 <- dunn_test10$res
@@ -359,6 +432,10 @@ significant_results11<- dunn_test11$res %>%
 filter(P.adj < 0.05)
 print(significant_results11)
 
+#  Comparison        Z      P.unadj        P.adj
+#      C - Z 3.362609 0.0007720971 0.0046325824
+#      V - Z 3.791523 0.0001497262 0.0008983573
+
 #grafico 
 dunn_res11<- dunn_test11$res
 comparisons <- strsplit(dunn_res11$Comparison, " - ")
@@ -394,7 +471,7 @@ mod12<- aov(MPtype_COD ~ Nest, data = DB_MP_noNA)
 summary(mod12)
 residui12 <- residuals(mod12)
 shapiro.test(residui12) #W = 0.8904, p-value < 2.2e-16 distribuzione NON normale
-leveneTest(MPtype_COD ~ Nest, data = DB_MP_noNA) #p.value=0.4807 ; varianze omogenee 
+leveneTest(MPtype_COD ~ Nest, data = DB_MP_noNA) #p.value=0.4807 ; varianze omogenee (ACCETTI HO)
 
 kruskal.test(MPtype_COD ~ Nest, data = DB_MP_noNA) #p-value = 0.007728 ;  ESISTONO differenze 
 
@@ -405,6 +482,9 @@ dunn_test12
 significant_results12<- dunn_test12$res %>%
 filter(P.adj < 0.05)
 print(significant_results12)
+
+# Comparison        Z     P.unadj      P.adj
+#      C - G 2.870059 0.004103957 0.01231187
 
 #grafico 
 dunn_res12<- dunn_test12$res
@@ -443,6 +523,15 @@ significant_results13<- dunn_test13$res %>%
 filter(P.adj < 0.05)
 print(significant_results13)
 
+#                               Comparison         Z      P.unadj        P.adj
+#           Bologna.CREAA - Bologna.Dumbo -3.182462 1.460287e-03 2.190431e-02
+#              Bologna.CREAA - Milan.Bam -5.585307 2.332874e-08 3.499312e-07
+# Bologna.Giardini Margherita - Milan.Bam -4.436560 9.140768e-06 1.371115e-04
+#        Bologna.Dumbo - Milan.Parco Nord  2.974783 2.931959e-03 4.397938e-02
+#            Milan.Bam - Milan.Parco Nord  5.792520 6.933803e-09 1.040071e-07
+#         Bologna.Dumbo - Milan.Velodromo  2.962319 3.053315e-03 4.579972e-02
+#             Milan.Bam - Milan.Velodromo  5.681681 1.333772e-08 2.000657e-07
+
 #Grafico
 dunn_res13<- dunn_test13$res
 DB_MP$Group <- interaction(DB_MP$City, DB_MP$Site)
@@ -468,9 +557,9 @@ summary(mod14)
 residui14 <- residuals(mod14)
 shapiro.test(residui14) #W = 0.9332, p-value = 6.226e-16 distribuzione NON normale
 
-leveneTest(MPtype_COD ~ interaction(City, Site), data = DB_MP) #p.value=0.09287 ; varianze omogenee 
+leveneTest(MPtype_COD ~ interaction(City, Site), data = DB_MP) #p.value=0.09287 ; varianze omogenee (accetti HO)
 
-kruskal.test(MPtype_COD ~ interaction(City, Site), data = DB_MP) #p-value=2.159e-05 ;  ESISTONO differenze 
+kruskal.test(MPtype_COD ~ interaction(City, Site), data = DB_MP) #p-value=2.159e-05 ; ESISTONO differenze tra gruppi
 
 dunn_test14 <- dunnTest(MPtype_COD ~ interaction(City, Site), data = DB_MP, method = "bonferroni")
 dunn_test14
@@ -480,9 +569,10 @@ significant_results14<- dunn_test14$res %>%
 filter(P.adj < 0.05)
 print(significant_results14)
 
-#Bologna.CREAA - Milan.Bam ;  0.0004250226
-#Milan.Bam - Milan.Parco Nord ; 0.0010529395
-#Milan.Bam - Milan.Velodromo ; 0.0002317176
+#                    Comparison         Z      P.unadj        P.adj
+#    Bologna.CREAA - Milan.Bam -4.186452 2.833484e-05 0.0004250226
+# Milan.Bam - Milan.Parco Nord  3.975621 7.019597e-05 0.0010529395
+#  Milan.Bam - Milan.Velodromo  4.322204 1.544784e-05 0.0002317176
 
 #Grafico 
 dunn_res14<- dunn_test14$res
@@ -510,17 +600,79 @@ summary(mod15)
 residui15 <- residuals(mod15)
 shapiro.test(residui15) #W = 0.9075, p-value < 2.2e-16; distribuzione NON normale
 
-leveneTest(Tot_MP ~ interaction(Genus, Sex), data = DB_MP) #p.value= 6.757e-06 ; varianze sono omogenee 
+leveneTest(Tot_MP ~ interaction(Genus, Sex), data = DB_MP) #p.value= 6.757e-06 ; varianze omogenee 
 
-kruskal.test(Tot_MP ~ interaction(Genus, Sex), data = DB_MP) #p-value < 2.2e-16 ;  ESISTONO differenze 
+kruskal.test(Tot_MP ~ interaction(Genus, Sex), data = DB_MP) #p-value < 2.2e-16 ; ESISTONO differenze 
 
-dunn_test <- dunnTest(Tot_MP ~ interaction(Genus, Sex), data = DB_MP, method = "bonferroni")
-dunn_test
+dunn_test15 <- dunnTest(Tot_MP ~ interaction(Genus, Sex), data = DB_MP, method = "bonferroni")
+dunn_test15
 
 #per vedere solamente i risultati significativi Con p-value aggiustato < 0.05
-significant_results <- dunn_test$res %>%
+significant_results15 <- dunn_test15$res %>%
 filter(P.adj < 0.05)
-print(significant_results)
+print(significant_results15)
+
+                     Comparison         Z      P.unadj        P.adj
+#       Andrena.F - Anthidium.F -5.193371 2.065202e-07 1.158578e-04
+#      Andrena.M - Anthidium.F -6.885060 5.776326e-12 3.240519e-09
+#       Andrena.F - Anthidium.M -4.826359 1.390516e-06 7.800794e-04
+#       Andrena.M - Anthidium.M -6.613338 3.757503e-11 2.107959e-08
+#          Andrena.M - Bombus.F -5.649237 1.611612e-08 9.041143e-06
+#      Anthidium.F - Colletes.F  6.444643 1.158730e-10 6.500474e-08
+#      Anthidium.M - Colletes.F  6.153326 7.587485e-10 4.256579e-07
+#         Bombus.F - Colletes.F  5.224184 1.749248e-07 9.813284e-05
+#        Andrena.M - Halictus.F -5.215589 1.832343e-07 1.027944e-04
+#      Colletes.F - Halictus.F -4.807860 1.525542e-06 8.558293e-04
+#     Anthidium.F - Halictus.M  4.995488 5.868730e-07 3.292357e-04
+#    Anthidium.M - Halictus.M  4.647615 3.357946e-06 1.883808e-03
+#       Andrena.M - Hoplitis.F -4.751943 2.014716e-06 1.130256e-03
+#      Colletes.F - Hoplitis.F -4.658819 3.180292e-06 1.784144e-03
+# Anthidium.F - Lasioglossum.F  7.572919 3.649304e-14 2.047259e-11
+# Anthidium.M - Lasioglossum.F  7.449530 9.367356e-14 5.255087e-11
+#    Bombus.F - Lasioglossum.F  6.582745 4.618402e-11 2.590923e-08
+#  Halictus.F - Lasioglossum.F  6.267137 3.677469e-10 2.063060e-07
+#  Hoplitis.F - Lasioglossum.F  4.393056 1.117682e-05 6.270199e-03
+# Anthidium.F - Lasioglossum.M  6.701849 2.057988e-11 1.154531e-08  
+# Anthidium.M - Lasioglossum.M  6.420026 1.362513e-10 7.643698e-08  
+# Bombus.F - Lasioglossum.M     5.454531 4.910232e-08 2.754640e-05  
+# Halictus.F - Lasioglossum.M   5.019560 5.178991e-07 2.905414e-04  
+# Hoplitis.F - Lasioglossum.M   4.669805 3.014859e-06 1.691336e-03  
+# Andrena.M - Megachile.F      -4.335961 1.451249e-05 8.141509e-03  
+# Colletes.F - Megachile.F     -4.217696 2.468108e-05 1.384609e-02  
+# Lasioglossum.F - Megachile.F -3.987357 6.681334e-05 3.748228e-02  
+# Lasioglossum.M - Megachile.F -4.238060 2.254594e-05 1.264827e-02  
+# Anthidium.F - Megachile.M     5.850906 4.889030e-09 2.742746e-06  
+# Anthidium.M - Megachile.M     5.529854 3.204982e-08 1.797995e-05  
+# Bombus.F - Megachile.M        4.329096 1.497224e-05 8.399426e-03  
+# Anthidium.F - Seladonia.F     4.611166 4.004168e-06 2.246338e-03  
+# Anthidium.M - Seladonia.F     4.321538 1.549451e-05 8.692419e-03  
+# Andrena.M - Xylocopa.M       -4.789378 1.672989e-06 9.385467e-04  
+# Colletes.F - Xylocopa.M      -4.809274 1.514792e-06 8.497985e-04  
+# Halictus.M - Xylocopa.M      -3.990253 6.600299e-05 3.702768e-02  
+# Lasioglossum.F - Xylocopa.M  -4.375017 1.214233e-05 6.811844e-03  
+# Lasioglossum.M - Xylocopa.M  -4.755381 1.980721e-06 1.111184e-03  
+# Megachile.M - Xylocopa.M     -3.921059 8.816078e-05 4.945820e-02  
+# Seladonia.F - Xylocopa.M     -4.221194 2.430114e-05 1.363294e-02  
+
+#Grafico 
+DB_MP$Group <- interaction(DB_MP$Genus, DB_MP$Sex)
+dunn_res15 <- dunn_test15$res
+comparisons <- strsplit(dunn_res15$Comparison, " - ")
+all_groups <- unique(unlist(comparisons))
+p_matrix <- matrix(1, nrow = length(all_groups), ncol = length(all_groups), dimnames = list(all_groups, all_groups))
+for (i in 1:nrow(dunn_res15)) {
+  pair <- unlist(strsplit(dunn_res15$Comparison[i], " - "))
+  p_matrix[pair[1], pair[2]] <- dunn_res15$P.adj[i]
+  p_matrix[pair[2], pair[1]] <- dunn_res15$P.adj[i]}
+letters15 <- multcompLetters(p_matrix, threshold = 0.05)$Letters
+label_df15 <- data.frame(Group = names(letters15), Letters = letters15, stringsAsFactors = FALSE)
+medians15 <- aggregate(Tot_MP ~ Group, data = DB_MP, median)
+colnames(medians15) <- c("Group", "Median")
+label_df15 <- merge(label_df15, medians15, by = "Group")
+ggplot(DB_MP, aes(x = Group, y = Tot_MP, fill = Group)) +
+  geom_boxplot() +
+  geom_text(data = label_df15, aes(x = Group, y = Median + 0.1, label = Letters), inherit.aes = FALSE) + labs(title = "Tot_MP per combinazione Genus + Sex",  x = "Gruppo (Genus.Sex)", y = "Totale microplastiche (Tot_MP)") +
+  theme_minimal() + theme(axis.text.x = element_text(angle = 45, hjust = 1),  legend.position = "none")
 
 ############# MPtype ~ GENUS + SEX ############# 
 mod16<- aov(MPtype_COD ~ Genus + Sex, data = DB_MP)
@@ -528,46 +680,55 @@ summary(mod16)
 residui16 <- residuals(mod16)
 shapiro.test(residui16) #W = 0.96208, p-value = 1.723e-11; distribuzione NON normale
 
-leveneTest(MPtype_COD ~ interaction(Genus, Sex), data = DB_MP) #p.value= 0.01442 ; varianze non sono omogenee 
+leveneTest(MPtype_COD ~ interaction(Genus, Sex), data = DB_MP) #p.value= 0.01442 ; varianze non  omogenee 
 kruskal.test(MPtype_COD ~ interaction(Genus, Sex), data = DB_MP) #p-value 6.021e-13;  ESISTONO differenze 
 
-dunn_test <- dunnTest(MPtype_COD ~ interaction(Genus, Sex), data = DB_MP, method = "bonferroni")
-dunn_test
+dunn_test16 <- dunnTest(MPtype_COD ~ interaction(Genus, Sex), data = DB_MP, method = "bonferroni")
+dunn_test16
 
 #per vedere solamente i risultati significativi Con p-value aggiustato < 0.05
-significant_results <- dunn_test$res %>%
+significant_results16 <- dunn_test16$res %>%
 filter(P.adj < 0.05)
-print(significant_results)
+print(significant_results16)
+
+#                Comparison         Z      P.unadj        P.adj
+# Andrena.M - Anthidium.F     -4.036207  5.432233e-05  3.047483e-02  
+# Andrena.F - Anthidium.M     -4.599082  4.243570e-06  2.380642e-03  
+# Andrena.M - Anthidium.M     -5.551487  2.832498e-08  1.589031e-05  
+# Andrena.M - Bombus.F        -3.957253  7.581665e-05  4.253314e-02  
+# Anthidium.M - Colletes.F     4.804782  1.549199e-06  8.691007e-04  
+# Anthidium.M - Halictus.M     4.424628  9.660857e-06  5.419741e-03  
+# Anthidium.M - Lasioglossum.F 5.960026  2.521984e-09  1.414833e-06  
+# Anthidium.M - Lasioglossum.M 4.703313  2.559738e-06  1.436013e-03  
+# Anthidium.M - Seladonia.F    4.150303  3.320350e-05  1.862716e-02  
+# Andrena.M - Xylocopa.M      -4.337740  1.439555e-05  8.075906e-03  
+# Colletes.F - Xylocopa.M     -4.147507  3.361148e-05  1.885604e-02  
+# Halictus.M - Xylocopa.M     -3.940725  8.123581e-05  4.557329e-02  
+# Lasioglossum.M - Xylocopa.M -3.959234  7.519053e-05  4.218189e-02  
+# Seladonia.F - Xylocopa.M    -4.167007  3.086245e-05  1.731383e-02  
 
 #Grafico 
-dunn_results <- dunn_test$res
-comparisons <- strsplit(dunn_results$Comparison, " - ")
+DB_MP$Group <- interaction(DB_MP$Genus, DB_MP$Sex)
+dunn_res16 <- dunn_test16$res
+comparisons <- strsplit(dunn_res16$Comparison, " - ")
 all_groups <- unique(unlist(comparisons))
-p_matrix <- matrix(1, nrow = length(all_groups), ncol = length(all_groups),
-                   dimnames = list(all_groups, all_groups))
-for (i in 1:nrow(dunn_results)) {
-  pair <- unlist(strsplit(dunn_results$Comparison[i], " - "))
-  p_matrix[pair[1], pair[2]] <- dunn_results$P.adj[i]
-  p_matrix[pair[2], pair[1]] <- dunn_results$P.adj[i]}
-letters <- multcompLetters(p_matrix, threshold = 0.05)$Letters
-label_df <- data.frame(
-  Group = names(letters),
-  Letters = letters,
-  stringsAsFactors = FALSE)
-medians <- aggregate(MPtype_COD ~ interaction(Genus, Sex), data = DB_MP, median)
-colnames(medians) <- c("Group", "Median")
-label_df <- merge(label_df, medians, by = "Group")
-ggplot(DB_MP, aes(x = interaction(Genus, Sex), y = MPtype_COD, fill = interaction(Genus, Sex))) +
+p_matrix <- matrix(1, nrow = length(all_groups), ncol = length(all_groups), dimnames = list(all_groups, all_groups))
+for (i in 1:nrow(dunn_res16)) {
+  pair <- unlist(strsplit(dunn_res16$Comparison[i], " - "))
+  p_matrix[pair[1], pair[2]] <- dunn_res16$P.adj[i]
+  p_matrix[pair[2], pair[1]] <- dunn_res16$P.adj[i]}
+letters16 <- multcompLetters(p_matrix, threshold = 0.05)$Letters
+label_df16 <- data.frame(Group = names(letters16), Letters = letters16, stringsAsFactors = FALSE)
+medians16 <- aggregate(MPtype_COD ~ Group, data = DB_MP, median)
+colnames(medians16) <- c("Group", "Median")
+label_df16 <- merge(label_df16, medians16, by = "Group")
+ggplot(DB_MP, aes(x = Group, y = MPtype_COD, fill = Group)) +
   geom_boxplot() +
-  geom_text(data = label_df, aes(x = Group, y = Median + 0.1, label = Letters), inherit.aes = FALSE) +
-  labs(title = "Boxplot di MPtype_COD per gruppo (Genus:Sex)",
-       x = "Gruppi",
-       y = "MPtype_COD") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
-        legend.position = "none")
+  geom_text(data = label_df16,  aes(x = Group, y = Median + 0.1, label = Letters), inherit.aes = FALSE) +
+  labs(title = "MPtype_COD per combinazione Genus + Sex",
+   x = "Gruppo (Genus.Sex)", y = "MPtype_COD") + theme_minimal() + theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "none")
 
-############# 3. DOVE SI ACCUMULA LA PLASTICA SUL CORPO (TESTA*GENERI)?  #############
+############# DOVE SI ACCUMULA LA PLASTICA SUL CORPO (TESTA*GENERI)?  #############
 mod17<- aov(Head ~ Genus, data = DB_MP)
 residui17<- residuals(mod17)
 summary(mod17)
@@ -579,24 +740,59 @@ kruskal.test(Head ~ Genus, data = DB_MP) #p-value = 0.004341; ESISTONO differenz
 dunn_test <- dunnTest(Head ~ Genus, data = DB_MP, method = "bonferroni")
 dunn_test
 
+#per vedere solamente i risultati significativi Con p-value aggiustato < 0.05
+significant_results <- dunn_test$res %>%
+filter(P.adj < 0.05)
+print(significant_results)
+
+#NESSUNO
 #Le differenze specifiche tra le singole coppie non sono abbastanza forti/consistenti da risultare significative.
 
-############# 3. DOVE SI ACCUMULA LA PLASTICA SUL CORPO (LEGS*GENERI)?  #############
+############# DOVE SI ACCUMULA LA PLASTICA SUL CORPO (LEGS*GENERI)?  #############
 mod18 <- aov(Legs ~ Genus, data = DB_MP)
 residui18 <- residuals(mod18)
 summary(mod18)
 shapiro.test(residui18)  #W = 0.86848, p-value < 2.2e-16; non normale 
 
-leveneTest(Legs ~ Genus, data = DB_MP)  #p.value= 1.297e-07; non omogenee
-kruskal.test(Legs ~ Genus, data = DB_MP)  #p.value= 2.035e-15; differenze
+leveneTest(Legs ~ Genus, data = DB_MP)  #p.value= 1.297e-07; varianze non omogenee
+kruskal.test(Legs ~ Genus, data = DB_MP)  #p.value= 2.035e-15; esistono differenze
 
-dunn_test <- dunnTest(Legs ~ Genus, data = DB_MP, method = "bonferroni")
-dunn_test
+dunn_test18 <- dunnTest(Legs ~ Genus, data = DB_MP, method = "bonferroni")
+dunn_test18
 
 #per vedere solamente i risultati significativi Con p-value aggiustato < 0.05
-significant_results <- dunn_test$res %>%
+significant_results18 <- dunn_test18$res %>%
 filter(P.adj < 0.05)
-print(significant_results)
+print(significant_results18)
+
+#            Comparison         Z      P.unadj        P.adj
+#      Andrena - Anthidium -5.725148 1.033435e-08 1.963526e-06
+#         Andrena - Bombus -4.106667 4.014101e-05 7.626792e-03
+#     Anthidium - Colletes  4.221940 2.422091e-05 4.601972e-03
+#       Andrena - Halictus -3.786524 1.527692e-04 2.902615e-02
+#     Anthidium - Hoplitis  3.981261 6.855077e-05 1.302465e-02
+# Anthidium - Lasioglossum  7.780848 7.203985e-15 1.368757e-12
+#    Bombus - Lasioglossum  5.891188 3.834295e-09 7.285161e-07
+#  Halictus - Lasioglossum  5.604887 2.083903e-08 3.959416e-06
+#   Anthidium - Megachile  4.686453 2.779809e-06 5.281636e-04
+
+#Grafico 
+dunn_res18 <- dunn_test18$res
+comparisons <- strsplit(dunn_res18$Comparison, " - ")
+all_groups <- unique(unlist(comparisons))
+p_matrix <- matrix(1, nrow = length(all_groups), ncol = length(all_groups), dimnames = list(all_groups, all_groups))
+for (i in 1:nrow(dunn_res18)) {
+  pair <- unlist(strsplit(dunn_res18$Comparison[i], " - "))
+  p_matrix[pair[1], pair[2]] <- dunn_res18$P.adj[i]
+  p_matrix[pair[2], pair[1]] <- dunn_res18$P.adj[i]}
+letters18 <- multcompLetters(p_matrix, threshold = 0.05)$Letters
+label_df18 <- data.frame(Genus = names(letters18), Letters = letters18, stringsAsFactors = FALSE)
+medians18 <- aggregate(Legs ~ Genus, data = DB_MP, median)
+colnames(medians18) <- c("Genus", "Median")
+label_df18 <- merge(label_df18, medians18, by = "Genus")
+ggplot(DB_MP, aes(x = Genus, y = Legs, fill = Genus)) + geom_boxplot() + geom_text(data = label_df18,  aes(x = Genus, y = Median + 0.1, label = Letters), inherit.aes = FALSE) +
+  labs(title = "Numero di microplastiche sulle zampe per Genere",
+       x = "Genere (Genus)", y = "MP contate sulle zampe (Legs)") + theme_minimal() + theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "none")
 
 ############# DOVE SI ACCUMULA LA PLASTICA SUL CORPO (TORAX*GENERI)? #############
 mod19 <- aov(Torax ~ Genus, data = DB_MP)
@@ -604,16 +800,46 @@ residui19 <- residuals(mod18)
 summary(mod19)
 shapiro.test(residui19)  #W = 0.86848, p-value < 2.2e-16
 
-leveneTest(Torax ~ Genus, data = DB_MP)  #p.value=0.006432; sono omogenee
-kruskal.test(Torax ~ Genus, data = DB_MP)  #p.value=3.406e-07
+leveneTest(Torax ~ Genus, data = DB_MP)  #p.value=0.006432; varianze sono omogenee
+kruskal.test(Torax ~ Genus, data = DB_MP)  #p.value=3.406e-07 ; esistono differenze
 
-dunn_test <- dunnTest(Torax ~ Genus, data = DB_MP, method = "bonferroni")
-dunn_test
+dunn_test19 <- dunnTest(Torax ~ Genus, data = DB_MP, method = "bonferroni")
+dunn_test19
 
 #per vedere solamente i risultati significativi Con p-value aggiustato < 0.05
-significant_results <- dunn_test$res %>%
+significant_results19 <- dunn_test19$res %>%
 filter(P.adj < 0.05)
-print(significant_results)
+print(significant_results19)
+
+#       Comparison         Z      P.unadj        P.adj
+#       Andrena - Bombus -3.739801 1.841662e-04 0.0349915863
+#   Bombus - Lasioglossum  4.913485 8.947144e-07 0.0001699957
+#      Bombus - Megachile  4.026850 5.652898e-05 0.0107405059
+#      Andrena - Xylocopa -4.234755 2.288007e-05 0.0043472140
+#     Colletes - Xylocopa -3.839908 1.230805e-04 0.0233853027
+#     Halictus - Xylocopa -3.809203 1.394156e-04 0.0264889598
+# Lasioglossum - Xylocopa -4.433384 9.276543e-06 0.0017625431
+#    Megachile - Xylocopa -4.261206 2.033265e-05 0.0038632033
+#    Seladonia - Xylocopa -4.047618 5.174146e-05 0.0098308771
+
+#Grafico
+dunn_res19 <- dunn_test19$res
+comparisons <- strsplit(dunn_res19$Comparison, " - ")
+all_groups <- unique(unlist(comparisons))
+p_matrix <- matrix(1, nrow = length(all_groups), ncol = length(all_groups), dimnames = list(all_groups, all_groups))
+for (i in 1:nrow(dunn_res19)) {
+  pair <- unlist(strsplit(dunn_res19$Comparison[i], " - "))
+  p_matrix[pair[1], pair[2]] <- dunn_res19$P.adj[i]
+  p_matrix[pair[2], pair[1]] <- dunn_res19$P.adj[i]}
+letters19 <- multcompLetters(p_matrix, threshold = 0.05)$Letters
+label_df19 <- data.frame(Genus = names(letters19), Letters = letters19, stringsAsFactors = FALSE)
+medians19 <- aggregate(Torax ~ Genus, data = DB_MP, median)
+colnames(medians19) <- c("Genus", "Median")
+label_df19 <- merge(label_df19, medians19, by = "Genus")
+ggplot(DB_MP, aes(x = Genus, y = Torax, fill = Genus)) +
+  geom_boxplot() +  geom_text(data = label_df19,  aes(x = Genus, y = Median + 0.1, label = Letters),  inherit.aes = FALSE) +
+  labs(title = "MPtype_COD nel torace per Genere",  x = "Genere (Genus)", y = "MP trovate nel torace (Torax)") +
+  theme_minimal() + theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "none")
 
 ############# DOVE SI ACCUMULA LA PLASTICA SUL CORPO (ADDOME*GENERI)? #############
 mod20 <- aov(Abdomen ~ Genus, data = DB_MP)
@@ -621,34 +847,79 @@ residui20 <- residuals(mod20)
 summary(mod20)
 shapiro.test(residui20)  #W = 0.85607, p-value < 2.2e-16
 
-leveneTest(Abdomen ~ Genus, data = DB_MP)  #p.value=0.0094 ; omogenee
-kruskal.test(Abdomen ~ Genus, data = DB_MP)  #p.value=0.0003529
+leveneTest(Abdomen ~ Genus, data = DB_MP)  #p.value=0.0094 ; varianze NON mogenee
+kruskal.test(Abdomen ~ Genus, data = DB_MP)  #p.value=0.0003529; ESISTONO differenze tra gruppi
 
-dunn_test <- dunnTest(Abdomen ~ Genus, data = DB_MP, method = "bonferroni")
-dunn_test
+dunn_test20 <- dunnTest(Abdomen ~ Genus, data = DB_MP, method = "bonferroni")
+dunn_test20
 
-significant_results <- dunn_test$res %>%
+#per vedere solamente i risultati significativi Con p-value aggiustato < 0.05
+significant_results20 <- dunn_test20$res %>%
   filter(P.adj < 0.05)
-print(significant_results)
+print(significant_results20)
 
+#Comparison         Z      P.unadj      P.adj
+# Anthidium - Lasioglossum  4.035171 5.456258e-05 0.01036689
+#       Bombus - Xylocopa -3.770426 1.629688e-04 0.03096408
+#      Colletes - Xylocopa -3.650569 2.616601e-04 0.04971541
+#  Lasioglossum - Xylocopa -3.768065 1.645179e-04 0.03125841
+
+#Grafico 
+dunn_res20 <- dunn_test20$res
+comparisons <- strsplit(dunn_res20$Comparison, " - ")
+all_groups <- unique(unlist(comparisons))
+p_matrix <- matrix(1, nrow = length(all_groups), ncol = length(all_groups), dimnames = list(all_groups, all_groups))
+for (i in 1:nrow(dunn_res20)) {
+  pair <- unlist(strsplit(dunn_res20$Comparison[i], " - "))
+  p_matrix[pair[1], pair[2]] <- dunn_res20$P.adj[i]
+  p_matrix[pair[2], pair[1]] <- dunn_res20$P.adj[i]}
+letters20 <- multcompLetters(p_matrix, threshold = 0.05)$Letters
+label_df20 <- data.frame(Genus = names(letters20), Letters = letters20, stringsAsFactors = FALSE)
+medians20 <- aggregate(Abdomen ~ Genus, data = DB_MP, median)
+colnames(medians20) <- c("Genus", "Median")
+label_df20 <- merge(label_df20, medians20, by = "Genus")
+ggplot(DB_MP, aes(x = Genus, y = Abdomen, fill = Genus)) + geom_boxplot() +  geom_text(data = label_df20, aes(x = Genus, y = Median + 0.1, label = Letters),
+  inherit.aes = FALSE) + labs(title = "MP nell'addome per Genere", x = "Genere (Genus)", y = "MP trovate nell'addome (Abdomen)") +
+  theme_minimal() + theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "none")
 
 ############# DOVE SI ACCUMULA LA PLASTICA SUL CORPO (ALI*GENERI)? #############
 mod21 <- aov(Wings ~ Genus, data = DB_MP)
 residui21 <- residuals(mod21)
 summary(mod21)
-shapiro.test(residui21)  #W = 0.7097, p-value = 2.108e-14
+shapiro.test(residui21)  #W = 0.7097, p-value = 2.108e-14 ; distribuzione non normale
 
 leveneTest(Wings ~ Genus, data = DB_MP)  #p.value= 0.0812; Omogenee, non ci sono varianze tra i gruppi genus 
-kruskal.test(Wings ~ Genus, data = DB_MP)  #p-value = 0.01698
+kruskal.test(Wings ~ Genus, data = DB_MP)  #p-value = 0.01698 ; esistono differenze 
 
-dunn_test <- dunnTest(Wings ~ Genus, data = DB_MP, method = "bonferroni")
-dunn_test
+dunn_test21 <- dunnTest(Wings ~ Genus, data = DB_MP, method = "bonferroni")
+dunn_test21
 
 # Visualizza solo i confronti significativi (p-value aggiustato < 0.05)
-significant_results <- dunn_test$res %>%
+significant_results21 <- dunn_test21$res %>%
   filter(P.adj < 0.05)
-print(significant_results)
+print(significant_results21)
 
-#messuno risulta significativamente diverso
+#Nessuno risulta significativamente diverso
+
+#Grafico
+dunn_res21 <- dunn_test21$res
+comparisons <- strsplit(dunn_res21$Comparison, " - ")
+all_groups <- unique(unlist(comparisons))
+p_matrix <- matrix(1, nrow = length(all_groups), ncol = length(all_groups), dimnames = list(all_groups, all_groups))
+for (i in 1:nrow(dunn_res21)) {
+  pair <- unlist(strsplit(dunn_res21$Comparison[i], " - "))
+  p_matrix[pair[1], pair[2]] <- dunn_res21$P.adj[i]
+  p_matrix[pair[2], pair[1]] <- dunn_res21$P.adj[i]}
+letters21 <- multcompLetters(p_matrix, threshold = 0.05)$Letters
+label_df21 <- data.frame(Genus = names(letters21), Letters = letters21, stringsAsFactors = FALSE)
+medians21 <- aggregate(Wings ~ Genus, data = DB_MP, median)
+colnames(medians21) <- c("Genus", "Median")
+label_df21 <- merge(label_df21, medians21, by = "Genus")
+ggplot(DB_MP, aes(x = Genus, y = Wings, fill = Genus)) +
+  geom_boxplot() +
+  geom_text(data = label_df21, aes(x = Genus, y = Median + 0.1, label = Letters), inherit.aes = FALSE) +
+  labs(title = "MP sulle ali per Genere", x = "Genere (Genus)", y = "MP trovate sulle ali (Wings)") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "none")
 
 ############# DOVE SI ACCUMULANO LE MP (LEGS*SEX)? #############
