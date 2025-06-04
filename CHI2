@@ -13,11 +13,9 @@ residui1 <- chi2_1$residuals            #Analisi dei residui di Pearson
 residui1                                #<-2 = contribuisce negativamente ; >+2 contribuisce positivamente ; in mezzo= trascurabile
 
 ggplot(as.data.frame(as.table(residui1)), aes(Var1, Var2, fill = Freq)) +
-geom_tile() +
-geom_text(aes(label=round(Freq,2)), color="black") +
+geom_tile() + geom_text(aes(label=round(Freq,2)), color="black") +
 scale_fill_gradient2(midpoint = 0, low = "blue", mid = "white", high = "red") +
-theme_minimal() +
-labs(title = "Residui del test del chi-quadro", x = "Tot_MP", y = "Site")
+theme_minimal() + labs(title = "Residui del test del chi-quadro", x = "Tot_MP", y = "Site")
 
 any(tab1<5)         #Per vedere se la tab. di contingenza è <5
 fisher.test(tab1, simulate.p.value = TRUE, B = 1e5) #FISHER-MONTECARLO Perchè la tab contingenza <5; montecarlo perchè la tab è troppo grande 
@@ -32,11 +30,9 @@ residui2 <- chi2_2$residuals                #Analisi dei residui di Pearson
 residui2
 
 ggplot(as.data.frame(as.table(residui2)), aes(Var1, Var2, fill = Freq)) +
-geom_tile() +
-geom_text(aes(label=round(Freq,2)), color="black") +
+geom_tile() + geom_text(aes(label=round(Freq,2)), color="black") +
 scale_fill_gradient2(midpoint = 0, low = "blue", mid = "white", high = "red") +
-theme_minimal() +
-labs(title = "Residui del test del chi-quadro", x = "MPtype_COD", y = "Site")
+theme_minimal() + labs(title = "Residui del test del chi-quadro", x = "MPtype_COD", y = "Site")
 
 any(tab2<5)
 fisher.test(tab2, simulate.p.value = TRUE, B = 1e5) #FISHER-MONTECARLO Perchè la tab contingenza <5; montecarlo perchè la tab è troppo grande 
@@ -47,15 +43,15 @@ tab3 <- table(DB_MP$Tot_MP, DB_MP$Genus) #TABELLA DI CONTINGENZA
 chi2_3 <- chisq.test(tab3)                  #Esegui il test del chi-quadro
 chi2_3                                      #p-value = NA !!!!!
 
+sum(tab3 == 0) #ci sono 421 celle con freq = 0 
+
 residui3 <- chi2_3$residuals                #Analisi dei residui di Pearson
 residui3
 
 ggplot(as.data.frame(as.table(residui3)), aes(Var1, Var2, fill = Freq)) +
-geom_tile() +
-geom_text(aes(label=round(Freq,2)), color="black") +
+geom_tile() + geom_text(aes(label=round(Freq,2)), color="black") +
 scale_fill_gradient2(midpoint = 0, low = "blue", mid = "white", high = "red") +
-theme_minimal() +
-labs(title = "Residui del test del chi-quadro", x = "Tot_MP", y = "Genus")
+theme_minimal() + labs(title = "Residui del test del chi-quadro", x = "Tot_MP", y = "Genus")
 
 any(tab3<5)
 fisher.test(tab3, simulate.p.value = TRUE, B = 1e5) #FISHER-MONTECARLO Perchè la tab contingenza <5; montecarlo perchè la tab è troppo grande 
@@ -66,22 +62,22 @@ tab4 <- table(DB_MP$MPtype_COD, DB_MP$Genus) #TABELLA DI CONTINGENZA
 chi2_4 <- chisq.test(tab4)                  #Esegui il test del chi-quadro
 chi2_4                                      #p-value = NA
 
+sum(tab4 == 0) #ci sono 95 celle con freq = 0 
+
 residui4 <- chi2_4$residuals                #Analisi dei residui di Pearson
 residui4
 
 ggplot(as.data.frame(as.table(residui4)), aes(Var1, Var2, fill = Freq)) +
-geom_tile() +
-geom_text(aes(label=round(Freq,2)), color="black") +
+geom_tile() + geom_text(aes(label=round(Freq,2)), color="black") +
 scale_fill_gradient2(midpoint = 0, low = "blue", mid = "white", high = "red") +
-theme_minimal() +
-labs(title = "Residui del test del chi-quadro", x = "MPtype_COD", y = "Genus")
+theme_minimal() + labs(title = "Residui del test del chi-quadro", x = "MPtype_COD", y = "Genus")
 
 any(tab4<5)
 fisher.test(tab4, simulate.p.value = TRUE, B = 1e5) #FISHER-MONTECARLO Perchè la tab contingenza <5; montecarlo perchè la tab è troppo grande 
 #p-value=1e-05; NON indipendenti
 
 ################## TOT DI MP PER SESSO ################## 
-tab5 <- table(DB_MP$Tot_MP, DB_MP$Sex) #TABELLA DI CONTINGENZA
+tab5 <- table(DB_MP$Tot_MP, DB_MP$Sex)      #TABELLA DI CONTINGENZA
 chi2_5 <- chisq.test(tab5)                  #Esegui il test del chi-quadro
 chi2_5                                      #p-value = 0.1283 INDIPENDENTI
 
@@ -90,7 +86,7 @@ tab6 <- table(DB_MP$MPtype_COD, DB_MP$Sex) #TABELLA DI CONTINGENZA
 chi2_6 <- chisq.test(tab6)                  #Esegui il test del chi-quadro
 chi2_6                                      #p-value = 0.3821 INDIPENDENTI
 
-################## TOT DI MP PER NIDO ################## !!!!!!!!!!!!!!!!!!!!!!
+################## TOT DI MP PER NIDO ################## 
 #TOLGO GLI NA 
 DB_MP_clean <- DB_MP[!is.na(DB_MP$Nest) & !is.na(DB_MP$Scopa), ]
 
@@ -128,11 +124,9 @@ residui9 <- chi2_9$residuals                #Analisi dei residui di Pearson
 residui9
 
 ggplot(as.data.frame(as.table(residui9)), aes(Var1, Var2, fill = Freq)) +
-geom_tile() +
-geom_text(aes(label=round(Freq,2)), color="black") +
+geom_tile() + geom_text(aes(label=round(Freq,2)), color="black") +
 scale_fill_gradient2(midpoint = 0, low = "blue", mid = "white", high = "red") +
-theme_minimal() +
-labs(title = "Residui del test del chi-quadro", x = "Tot_MP", y = "Scopa")
+theme_minimal() + labs(title = "Residui del test del chi-quadro", x = "Tot_MP", y = "Scopa")
 
 any(tab9<5)
 fisher.test(tab9, simulate.p.value = TRUE, B = 1e5) #FISHER-MONTECARLO Perchè la tab contingenza <5; montecarlo perchè la tab è troppo grande 
@@ -149,11 +143,9 @@ residui10 <- chi2_10$residuals                #Analisi dei residui di Pearson
 residui10
 
 ggplot(as.data.frame(as.table(residui10)), aes(Var1, Var2, fill = Freq)) +
-geom_tile() +
-geom_text(aes(label=round(Freq,2)), color="black") +
+geom_tile() + geom_text(aes(label=round(Freq,2)), color="black") +
 scale_fill_gradient2(midpoint = 0, low = "blue", mid = "white", high = "red") +
-theme_minimal() +
-labs(title = "Residui del test del chi-quadro", x = "MPtype_COD", y = "Scopa")
+theme_minimal() + labs(title = "Residui del test del chi-quadro", x = "MPtype_COD", y = "Scopa")
 
 any(tab10<5)
 fisher.test(tab10, simulate.p.value = TRUE, B = 1e5) #FISHER-MONTECARLO Perchè la tab contingenza <5; montecarlo perchè la tab è troppo grande 
@@ -168,11 +160,9 @@ residui11 <- chi2_11$residuals                #Analisi dei residui di Pearson
 residui11
 
 ggplot(as.data.frame(as.table(residui11)), aes(Var1, Var2, fill = Freq)) +
-geom_tile() +
-geom_text(aes(label=round(Freq,2)), color="black") +
+geom_tile() + geom_text(aes(label=round(Freq,2)), color="black") +
 scale_fill_gradient2(midpoint = 0, low = "blue", mid = "white", high = "red") +
-theme_minimal() +
-labs(title = "Residui del test del chi-quadro", x = "Tot_MP", y = "Dimensions")
+theme_minimal() + labs(title = "Residui del test del chi-quadro", x = "Tot_MP", y = "Dimensions")
 
 any(tab11<5)
 fisher.test(tab11, simulate.p.value = TRUE, B = 1e5) #FISHER-MONTECARLO Perchè la tab contingenza <5; montecarlo perchè la tab è troppo grande 
@@ -187,11 +177,9 @@ residui12 <- chi2_12$residuals                #Analisi dei residui di Pearson
 residui12
 
 ggplot(as.data.frame(as.table(residui12)), aes(Var1, Var2, fill = Freq)) +
-geom_tile() +
-geom_text(aes(label=round(Freq,2)), color="black") +
+geom_tile() + geom_text(aes(label=round(Freq,2)), color="black") +
 scale_fill_gradient2(midpoint = 0, low = "blue", mid = "white", high = "red") +
-theme_minimal() +
-labs(title = "Residui del test del chi-quadro", x = "MPtype_COD", y = "Dimensions")
+theme_minimal() + labs(title = "Residui del test del chi-quadro", x = "MPtype_COD", y = "Dimensions")
 
 any(tab12<5)
 fisher.test(tab12, simulate.p.value = TRUE, B = 1e5) #FISHER-MONTECARLO Perchè la tab contingenza <5; montecarlo perchè la tab è troppo grande 
