@@ -1,7 +1,7 @@
 #res.mca1 <- MCA(MCA1, graph = FALSE) crea l'oggetto dell'analisi
 #fviz_mca_var(res.mca1, repel = TRUE) quali categorie sono simili o associate  (nest, tot mp...)
 #fviz_mca_ind(res.mca44, repel = FALSE) Mostra ogni riga del tuo dataset come un punto. Come si distribuiscono le osservazioni rispetto alle categorie
-##CON IND, ESEMPIO= Due punti (individui) vicini → probabilmente hanno categorie simili (es. entrambi sono fiber, urban, Nest1).
+##CON fviz_mca_ind, ESEMPIO= Due punti (individui) vicini → probabilmente hanno categorie simili (es. entrambi sono fiber, urban, Nest1).
 
 #TRUE se vuoi che le etichette non si sovrappongano, più leggibile
 #FALSE si sovrappongono; più pulito se ci sono molti punti o se non servono le etichette
@@ -53,14 +53,16 @@ fviz_mca_var(res.mca5, repel = TRUE)
 fviz_mca_ind(res.mca5, repel = FALSE)
 fviz_mca_biplot(res.mca5, repel = FALSE)
 
-##City ✚ TIPO Microplastiche ✚ Dimensioni ##Si potrebbe fare anche con Site? al posto di City o aggiungerla come variabile?
+##City ✚ TIPO Microplastiche ✚ Dimensioni 
+##Si potrebbe fare anche con Site? al posto di City o aggiungerla come variabile?
 MCA6 <-DB_MP_f[, c("City", "MPtype_COD", "Dimensions")]
 res.mca6 <- MCA(MCA6, graph = FALSE)
 fviz_mca_var(res.mca6, repel = TRUE)
 fviz_mca_ind(res.mca6, repel = FALSE)
 fviz_mca_biplot(res.mca6, repel = FALSE)
 
-##City ✚ TOT Microplastiche ✚ Nido ##Si potrebbe fare anche con Site? al posto di City o aggiungerla come variabile?
+##City ✚ TOT Microplastiche ✚ Nido 
+##Si potrebbe fare anche con Site? al posto di City o aggiungerla come variabile?
 MCA7 <- DB_MP_f[, c("City", "Nest", "Tot_MP")]
 MCA7 <- MCA7[!is.na(MCA8$Nest),] #SECONDO ME HA SENSO TOGLIERE GLI NA 
 res.mca7 <- MCA(MCA7, graph = FALSE)
@@ -68,7 +70,8 @@ fviz_mca_var(res.mca7, repel = TRUE)
 fviz_mca_ind(res.mca7, repel = FALSE)
 fviz_mca_biplot(res.mca7, repel = FALSE)
 
-##City ✚ TOT Microplastiche ✚ Nido ✚ Sex ##E' meglio se seleziono solo le femmine? 
+##City ✚ TOT Microplastiche ✚ Nido ✚ Sex 
+##E' meglio se seleziono solo le femmine? 
 MCA8 <- DB_MP_f[, c("City", "Nest", "Tot_MP", "Sex")]
 MCA8 <- MCA8[!is.na(MCA8$Nest),] #SECONDO ME HA SENSO TOGLIERE GLI NA 
 MCA8 <- MCA8[!is.na(MCA8$Sex),] #SECONDO ME HA SENSO TOGLIERE GLI NA 
@@ -77,7 +80,8 @@ fviz_mca_var(res.mca8, repel = TRUE)
 fviz_mca_ind(res.mca8, repel = FALSE)
 fviz_mca_biplot(res.mca8, repel = FALSE)
 
-##City ✚ TIPO Microplastiche ✚ Nido ##Si potrebbe fare anche con Site? al posto di City o aggiungerla come variabile?
+##City ✚ TIPO Microplastiche ✚ Nido 
+##Si potrebbe fare anche con Site? al posto di City o aggiungerla come variabile?
 MCA9 <- DB_MP_f[, c("City", "Nest", "MPtype_COD")]
 MCA9 <- MCA9[!is.na(MCA9$Nest),] #SECONDO ME HA SENSO TOGLIERE GLI NA 
 res.mca3 <- MCA(MCA9, graph = FALSE)
@@ -85,7 +89,8 @@ fviz_mca_var(res.mca9, repel = TRUE)
 fviz_mca_ind(res.mca9, repel = FALSE)
 fviz_mca_biplot(res.mca9, repel = FALSE)
 
-##City ✚ TOT Microplastiche ✚ Sesso ##Si potrebbe fare anche con Site? al posto di City o aggiungerla come variabile?
+##City ✚ TOT Microplastiche ✚ Sesso 
+##Si potrebbe fare anche con Site? al posto di City o aggiungerla come variabile?
 MCA10 <- DB_MP_f[, c("City", "Sex", "Tot_MP")]
 MCA10 <- MCA10[!is.na(MCA10$Sex),] #SECONDO ME HA SENSO TOGLIERE GLI NA 
 res.mca10 <- MCA(MCA10, graph = FALSE)
@@ -93,7 +98,8 @@ fviz_mca_var(res.mca10, repel = TRUE)
 fviz_mca_ind(res.mca10, repel = FALSE)
 fviz_mca_biplot(res.mca10, repel = FALSE)
 
-##City ✚ TIPO Microplastiche ✚ Sesso ##Si potrebbe fare anche con Site? al posto di City o aggiungerla come variabile?
+##City ✚ TIPO Microplastiche ✚ Sesso 
+##Si potrebbe fare anche con Site? al posto di City o aggiungerla come variabile?
 MCA11<- DB_MP_f[, c("City", "Sex", "MPtype_COD")]
 MCA11 <- MCA11[!is.na(MCA11$Sex),] #SECONDO ME HA SENSO TOGLIERE GLI NA 
 res.mca11 <- MCA(MCA11, graph = FALSE)
