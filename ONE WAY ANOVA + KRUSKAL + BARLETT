@@ -360,45 +360,22 @@ filter(P.adj < 0.05)
 print(significant_results11)
 
 #grafico 
-gdunn_res11 <- dunn_test11$res
-
-# Prepara matrice dei p-value per ottenere lettere di significatività
+dunn_res11<- dunn_test11$res
 comparisons <- strsplit(dunn_res11$Comparison, " - ")
 all_groups <- unique(unlist(comparisons))
-
-p_matrix <- matrix(1, nrow = length(all_groups), ncol = length(all_groups),
-                   dimnames = list(all_groups, all_groups))
-
+p_matrix <- matrix(1, nrow = length(all_groups), ncol = length(all_groups), dimnames = list(all_groups, all_groups))
 for (i in 1:nrow(dunn_res11)) {
   pair <- unlist(strsplit(dunn_res11$Comparison[i], " - "))
   p_matrix[pair[1], pair[2]] <- dunn_res11$P.adj[i]
-  p_matrix[pair[2], pair[1]] <- dunn_res11$P.adj[i]
-}
-
-# Calcolo lettere di significatività
+  p_matrix[pair[2], pair[1]] <- dunn_res11$P.adj[i]}
 letters11 <- multcompLetters(p_matrix, threshold = 0.05)$Letters
-label_df11 <- data.frame(
-  Scopa = names(letters11),
-  Letters = letters11,
-  stringsAsFactors = FALSE
-)
-
-# Calcolo delle mediane per posizionare le lettere
+label_df11 <- data.frame( Scopa = names(letters11),Letters = letters11, stringsAsFactors = FALSE)
 medians11 <- aggregate(MPtype_COD ~ Scopa, data = DB_MP_noNA, median)
 colnames(medians11) <- c("Scopa", "Median")
 label_df11 <- merge(label_df11, medians11, by = "Scopa")
-
-# Grafico
-ggplot(DB_MP_noNA, aes(x = Scopa, y = MPtype_COD, fill = Scopa)) +
-  geom_boxplot() +
-  geom_text(data = label_df11, aes(x = Scopa, y = Median + 0.1, label = Letters),
-            inherit.aes = FALSE) +
-  labs(title = "MPtype_COD rispetto alla presenza della Scopa",
-       x = "Presenza della Scopa",
-       y = "MPtype_COD") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
-        legend.position = "none")
+ggplot(DB_MP_noNA, aes(x = Scopa, y = MPtype_COD, fill = Scopa)) + geom_boxplot() + geom_text(data = label_df11, aes(x = Scopa, y = Median + 0.1, label = Letters),
+  inherit.aes = FALSE) + labs(title = "MPtype_COD rispetto alla presenza della Scopa",
+  x = "Presenza della Scopa", y = "MPtype_COD") + theme_minimal() + theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "none")
 
 ############# MPTYPE * NIDO ############# 
 #PENSO CHE ABBIA SENSO TOGLIERE GLI NA PERCHE' CE L'HANNO SOLAMENTE LE FEMMINE: 
@@ -421,29 +398,31 @@ leveneTest(MPtype_COD ~ Nest, data = DB_MP_noNA) #p.value=0.4807 ; varianze omog
 
 kruskal.test(MPtype_COD ~ Nest, data = DB_MP_noNA) #p-value = 0.007728 ;  ESISTONO differenze 
 
-dunn_test <- dunnTest(MPtype_COD ~ Nest, data = DB_MP_noNA, method = "bonferroni")
-dunn_test
+dunn_test12 <- dunnTest(MPtype_COD ~ Nest, data = DB_MP_noNA, method = "bonferroni")
+dunn_test12
 
-#C-G significativo
+#per vedere solamente i risultati significativi Con p-value aggiustato < 0.05
+significant_results12<- dunn_test12$res %>%
+filter(P.adj < 0.05)
+print(significant_results12)
 
 #grafico 
-pvals <- c("C-G" = 0.01231187, "C-S" = 0.38132060, "G-S" = 0.74295734)
-letters <- multcompLetters(pvals, threshold = 0.05)$Letters
-letters <- letters[levels(DB_MP_noNA$Nest)]
-y_pos <- tapply(DB_MP_noNA$MPtype_COD, DB_MP_noNA$Nest, max) * 1.05
-letters_df <- data.frame(
-  Nest = names(letters),
-  Letters = letters,
-  y = y_pos)
-ggplot(DB_MP_noNA, aes(x = Nest, y = MPtype_COD, fill = Nest)) +
-  geom_boxplot() +
-  geom_text(data = letters_df, aes(x = Nest, y = y, label = Letters), size = 6, inherit.aes = FALSE) +
-  theme_minimal() +
-  labs(title = "MPtype_COD per Nest con lettere di significatività",
-       y = "MPtype_COD",
-       x = "Nest") +
-  theme(legend.position = "none") +
-  ylim(NA, max(letters_df$y) * 1.1)
+dunn_res12<- dunn_test12$res
+comparisons <- strsplit(dunn_res12$Comparison, " - ")
+all_groups <- unique(unlist(comparisons))
+p_matrix <- matrix(1, nrow = length(all_groups), ncol = length(all_groups), dimnames = list(all_groups, all_groups))
+for (i in 1:nrow(dunn_res12)) {
+  pair <- unlist(strsplit(dunn_res12$Comparison[i], " - "))
+  p_matrix[pair[1], pair[2]] <- dunn_res11$P.adj[i]
+  p_matrix[pair[2], pair[1]] <- dunn_res11$P.adj[i]}
+letters11 <- multcompLetters(p_matrix, threshold = 0.05)$Letters
+label_df11 <- data.frame( Nest = names(letters11),Letters = letters11, stringsAsFactors = FALSE)
+medians11 <- aggregate(MPtype_COD ~ Nest, data = DB_MP_noNA, median)
+colnames(medians11) <- c("Nest", "Median")
+label_df11 <- merge(label_df11, medians11, by = "Nest")
+ggplot(DB_MP_noNA, aes(x = Nest, y = MPtype_COD, fill = Nest)) + geom_boxplot() + geom_text(data = label_df11, aes(x = Nest, y = Median + 0.1, label = Letters),
+  inherit.aes = FALSE) + labs(title = "MPtype_COD rispetto al tipo di Nest",
+  x = "Tipo di Nest", y = "MPtype_COD") + theme_minimal() + theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "none")
 
 ############# TOT MP ~ CITY + SITE ############# 
 mod13<- aov(Tot_MP ~ City + Site, data = DB_MP)
@@ -456,36 +435,32 @@ leveneTest(Tot_MP ~ interaction(City, Site), data = DB_MP) #p.value=0.001617 ; v
 
 kruskal.test(Tot_MP ~ interaction(City, Site), data = DB_MP) #p-value = 4.427e-10 ;  ESISTONO differenze 
 
-dunn_test <- dunnTest(Tot_MP ~ interaction(City, Site), data = DB_MP, method = "bonferroni")
-dunn_test
+dunn_test13 <- dunnTest(Tot_MP ~ interaction(City, Site), data = DB_MP, method = "bonferroni")
+dunn_test13
 
-#	Bologna.CREAA - Bologna.Dumbo	0.0219
-#	Bologna.CREAA - Milan.Bam	3.5e-07
-#	Bologna.Giardini Margherita - Milan.Bam	0.000137
-#	Bologna.Dumbo - Milan.Parco Nord	0.0439
-#	Bologna.Dumbo - Milan.Velodromo	0.0458
-#	Milan.Bam - Milan.Velodromo	2e-07
+#per vedere solamente i risultati significativi Con p-value aggiustato < 0.05
+significant_results13<- dunn_test13$res %>%
+filter(P.adj < 0.05)
+print(significant_results13)
 
-ggplot(DB_MP, aes(x = interaction(City, Site), y = Tot_MP, fill = City)) +
-  geom_boxplot() +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  labs(title = "Distribuzione Tot_MP per gruppo City-Site",
-       x = "Gruppi (City.Site)", y = "Tot_MP") +
-  geom_signif(
-    comparisons = list(
-      c("Bologna.CREAA", "Bologna.Dumbo"),
-      c("Bologna.CREAA", "Milan.Bam"),
-      c("Bologna.Dumbo", "Milan.Bam"),
-      c("Bologna.Giardini Margherita", "Milan.Bam"),
-      c("Bologna.Dumbo", "Milan.Parco Nord"),
-      c("Milan.Bam", "Milan.Parco Nord"),
-      c("Bologna.Dumbo", "Milan.Velodromo"),
-      c("Milan.Bam", "Milan.Velodromo")),
-    map_signif_level = FALSE, 
-    annotations = NA,          
-    test = "wilcox.test",
-    step_increase = 0.1)
+#Grafico
+dunn_res13<- dunn_test13$res
+DB_MP$Group <- interaction(DB_MP$City, DB_MP$Site)
+comparisons <- strsplit(dunn_res13$Comparison, " - ")
+all_groups <- unique(unlist(comparisons))
+p_matrix <- matrix(1, nrow = length(all_groups), ncol = length(all_groups), dimnames = list(all_groups, all_groups))
+for (i in 1:nrow(dunn_res13)) {
+  pair <- unlist(strsplit(dunn_res13$Comparison[i], " - "))
+  p_matrix[pair[1], pair[2]] <- dunn_res13$P.adj[i]
+  p_matrix[pair[2], pair[1]] <- dunn_res13$P.adj[i]}
+letters13 <- multcompLetters(p_matrix, threshold = 0.05)$Letters
+label_df13 <- data.frame(Group = names(letters13), Letters = letters13, stringsAsFactors = FALSE)
+medians13 <- aggregate(Tot_MP ~ Group, data = DB_MP, median)
+colnames(medians13) <- c("Group", "Median")
+label_df13 <- merge(label_df13, medians13, by = "Group")
+ggplot(DB_MP, aes(x = Group, y = Tot_MP, fill = Group)) + geom_boxplot() + geom_text(data = label_df13,
+aes(x = Group, y = Median + 0.1, label = Letters), inherit.aes = FALSE) + labs(title = "Tot_MP per combinazione City + Site",
+x = "Gruppo (City.Site)", y = "Totale microplastiche") + theme_minimal() + theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "none")
 
 ############# MPtype ~ CITY + SITE ############# 
 mod14<- aov(MPtype_COD ~ City + Site, data = DB_MP)
@@ -497,23 +472,37 @@ leveneTest(MPtype_COD ~ interaction(City, Site), data = DB_MP) #p.value=0.09287 
 
 kruskal.test(MPtype_COD ~ interaction(City, Site), data = DB_MP) #p-value=2.159e-05 ;  ESISTONO differenze 
 
-dunn_test <- dunnTest(MPtype_COD ~ interaction(City, Site), data = DB_MP, method = "bonferroni")
-dunn_test
+dunn_test14 <- dunnTest(MPtype_COD ~ interaction(City, Site), data = DB_MP, method = "bonferroni")
+dunn_test14
+
+#per vedere solamente i risultati significativi Con p-value aggiustato < 0.05
+significant_results14<- dunn_test14$res %>%
+filter(P.adj < 0.05)
+print(significant_results14)
 
 #Bologna.CREAA - Milan.Bam ;  0.0004250226
 #Milan.Bam - Milan.Parco Nord ; 0.0010529395
 #Milan.Bam - Milan.Velodromo ; 0.0002317176
 
-ggplot(DB_MP, aes(x = interaction(City, Site), y = MPtype_COD)) +
-  geom_boxplot(alpha = 0.7, outlier.color = "red", outlier.shape = 16, fill = "lightblue") +
-  geom_text(data = posizioni, aes(x = Group, y = Position, label = Letter), size = 6, vjust = 0) +
-  theme_minimal(base_size = 14) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  labs(
-    x = "Gruppi (City.Site)",
-    y = "MPtype_COD",
-    title = "Confronto tra gruppi con Dunn Test (Bonferroni)",
-    subtitle = "Lettere indicano differenze significative")
+#Grafico 
+dunn_res14<- dunn_test14$res
+DB_MP$Group <- interaction(DB_MP$City, DB_MP$Site)
+comparisons <- strsplit(dunn_res14$Comparison, " - ")
+all_groups <- unique(unlist(comparisons))
+p_matrix <- matrix(1, nrow = length(all_groups), ncol = length(all_groups), dimnames = list(all_groups, all_groups))
+for (i in 1:nrow(dunn_res14)) {
+  pair <- unlist(strsplit(dunn_res14$Comparison[i], " - "))
+  p_matrix[pair[1], pair[2]] <- dunn_res14$P.adj[i]
+  p_matrix[pair[2], pair[1]] <- dunn_res14$P.adj[i]}
+letters14 <- multcompLetters(p_matrix, threshold = 0.05)$Letters
+label_df14 <- data.frame(Group = names(letters14), Letters = letters14, stringsAsFactors = FALSE)
+medians14 <- aggregate(MPtype_COD ~ Group, data = DB_MP, median)
+colnames(medians14) <- c("Group", "Median")
+label_df14 <- merge(label_df14, medians14, by = "Group")
+ggplot(DB_MP, aes(x = Group, y = MPtype_COD, fill = Group)) +
+  geom_boxplot() + geom_text(data = label_df14, aes(x = Group, y = Median + 0.1, label = Letters), inherit.aes = FALSE) +
+  labs(title = "MPtype_COD per combinazione City + Site", x = "Gruppo (City.Site)", y = "MPtype_COD") +
+  theme_minimal() + theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "none")
 
 ############# TOT MP ~ GENUS + SEX ############# 
 mod15<- aov(Tot_MP ~ Genus + Sex, data = DB_MP)
